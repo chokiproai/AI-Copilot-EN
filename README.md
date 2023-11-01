@@ -1,40 +1,40 @@
 <h1 align="center">AI Copilot (Bing AI)</h1>
 
-## [在 Hugging Face 上部署](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4%3Fduplicate%3Dtrue)
+## [Deploy on Hugging Face](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4%3Fduplicate%3Dtrue)
 
-## 介绍
-- ⭐ 基于 Microsoft New Bing，使用 Vue3 和 Go 定制构建的 Microsoft New Bing 网站。 它提供一致的用户界面体验，支持ChatGPT提示，并且本质上兼容Microsoft Bing AI的所有功能。 您无需登录即可聊天。
+## introduce
+- ⭐ Based on Microsoft New Bing, a Microsoft New Bing website custom built using Vue3 and Go. It provides a consistent user interface experience, supports ChatGPT prompts, and is essentially compatible with all features of Microsoft Bing AI. You don't need to log in to chat.
 
-- ⭐ 使用Bing官方聊天服务器时（推荐速度和稳定性），可以参考以下解决方案：
+- ⭐ When using Bing official chat server (recommended speed and stability), you can refer to the following solutions:
 
-- ⭐ 聊天服务器（默认为“酷服务器”）。 每天的请求数量限制为 100,000 次。 可以在右上角的设置=>服务选项中更改。
+- ⭐ Chat Server (Default is "Cool Server"). The number of requests per day is limited to 100,000. This can be changed in Settings => Service Options in the upper right corner.
 
-- ⭐可用（部署服务器直接连接到www.bing.com，无需CN重定向，并且可以配置连接）
+- ⭐Available (deployment server connects directly to www.bing.com, no CN redirection required, and connection can be configured)
 
-- ⭐ 支持开源ChatGPT提示词汇
+- ⭐ Support open source ChatGPT prompt vocabulary
 
-- ⭐ 当您需要绘图等高级功能时（需要给出命令）。
+- ⭐ When you need advanced features like drawing (need to give commands).
 
-- ⭐如果遇到任何问题，请先点击左下角！ 不行的话尝试刷新一下，（Shift+F5或者Ctrl+Shift+R或者右上角设置选择清除cookies），最后一个提示就是清除浏览器缓存和cookies，比如（24- 小时限制、提示未登录等）
+- ⭐If you encounter any problems, please click on the lower left corner first! If it doesn't work, try refreshing it (Shift+F5 or Ctrl+Shift+R or select clear cookies in the upper right corner). The last tip is to clear the browser cache and cookies, such as (24-hour limit, prompt not logged in, etc.)
 
-- ⭐ 需要选择创意对话模式
+- ⭐ Need to choose creative dialogue mode
 
-## 关联
+## Association
 
->⭐ [聊天AI](https://ngoctuanai-gpt4.hf.space)
+>⭐[Chat AI](https://ngoctuanai-gpt4.hf.space)
 
->⭐ [图像创建器](https://ngoctuanai-gpt4.hf.space/create)
+>⭐[Image Creator](https://ngoctuanai-gpt4.hf.space/create)
 
-## 视频
+## video
 
->⭐[聊天AI](https://onedrive.live.com/embed?resid=750758803F9E18F7%21169&authkey=!AGg5_c6ntyVBk0s)
+>⭐[Chat AI](https://onedrive.live.com/embed?resid=750758803F9E18F7%21169&authkey=!AGg5_c6ntyVBk0s)
 
->⭐[图像创建者](https://onedrive.live.com/embed?resid=750758803F9E18F7%21170&authkey=!AA6KYWKRIIZ2_Ug)
+>⭐[Image Creator](https://onedrive.live.com/embed?resid=750758803F9E18F7%21170&authkey=!AA6KYWKRIIZ2_Ug)
 
-## 全部
-- [x] 撰写
-- [x] Vue3重构
-- [x] 建议的单词
-- [x] 聊天记录
-- [x] 本地导出消息（Markdown、图像、PDF）
-- [x] 简单的访问控制
+## all
+- [x] Compose
+- [x] Vue3 refactoring
+- [x] suggested words
+- [x] Chat history
+- [x] Local export of messages (Markdown, images, PDF)
+- [x] Simple access control
