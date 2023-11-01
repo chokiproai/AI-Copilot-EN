@@ -33,6 +33,12 @@
 
 >⭐[Image Creator](https://onedrive.live.com/embed?resid=750758803F9E18F7%21170&authkey=!AA6KYWKRIIZ2_Ug)
 
+### How to get BING_COOKIE
+
+> Configuring BING_COOKIE means you share your account with everyone who uses this service, the drawing function without logging in should set this variable.Open https://www.bing.com and Log in, then copy Cookie
+
+![BING_COOKIE](https://cdn-uploads.huggingface.co/production/uploads/65126d4afdba96cc3c3e7498/WMjxkZs20Y3UyC2RDyfT3.png)
+
 ## All
 - [x] Compose
 - [x] Vue3 refactoring
