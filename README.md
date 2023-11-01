@@ -1,6 +1,6 @@
 <h1 align="center">AI Copilot (Bing AI)</h1>
 
-## [Deploy on Hugging Face](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4%3Fduplicate%3Dtrue)
+## [Deploy on Hugging Face](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4en%3Fduplicate%3Dtrue)
 
 ## introduce
 - ⭐ Based on Microsoft New Bing, a Microsoft New Bing website custom built using Vue3 and Go. It provides a consistent user interface experience, supports ChatGPT prompts, and is essentially compatible with all features of Microsoft Bing AI. You don't need to log in to chat.
@@ -25,13 +25,13 @@
 
 >⭐[Image Creator](https://ngoctuanai-gpt4.hf.space/create)
 
-## video
+## Video
 
 >⭐[Chat AI](https://onedrive.live.com/embed?resid=750758803F9E18F7%21169&authkey=!AGg5_c6ntyVBk0s)
 
 >⭐[Image Creator](https://onedrive.live.com/embed?resid=750758803F9E18F7%21170&authkey=!AA6KYWKRIIZ2_Ug)
 
-## all
+## All
 - [x] Compose
 - [x] Vue3 refactoring
 - [x] suggested words
