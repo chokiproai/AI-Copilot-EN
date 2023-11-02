@@ -681,7 +681,7 @@ _w['_sydConvTranslation'] = {
   preciseSugg3:  'What makes the earth spin?',
   close:  'close',
   newTopicPrompt:  'With a new topic, you can start a brand new conversation with Bing on any topic',
-  typingIndicatorStopRespondingAriaLabel: '停止响应',
+  typingIndicatorStopRespondingAriaLabel: 'Stopped responding',
   loading:  'loading',
   canceling:  'Canceling',
   welcomeLearnSegment0: 'Bing is powered by AI, so surprises and errors can occur. Make sure to check the facts, and ',
