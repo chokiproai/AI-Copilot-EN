@@ -493,7 +493,7 @@ _w['_sydThreads'] = {
 _w['_sydConvTranslation'] = {
   actionBarPlaceholder: 'If you have a question, just ask me....(Shift + Enter = line break, "/" trigger prompt)',
    actionBarAriaLabel: 'Ask Bing',
-   actionBarComposeButton: 'New theme',
+   actionBarComposeButton: 'New topic',
    actionBarNewChatButtonDesktop: 'Start a new chat',
    actionBarNewChatButtonMobile: 'New chat',
    actionBarOngoingConvPlaceholder: 'Type message',
