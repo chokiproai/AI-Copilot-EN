@@ -21,7 +21,7 @@
 
 - ⭐ Need to choose creative dialogue mode
 
-## Association
+## Link
 
 >⭐[Chat AI](https://ngoctuanai-gpt4.hf.space)
 
