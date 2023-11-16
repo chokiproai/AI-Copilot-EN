@@ -21,9 +21,18 @@ import (
 
 var (
 	BING_SYDNEY_DOMAIN = "https://sydney.bing.com"
+	//BING_SYDNEY_DOMAIN = os.Getenv("SYDNEY_PROXY_DM")
+	BING_PROXY_RENDER = "https://proxybing.vercel.app"
+	//BING_PROXY_RENDER = os.Getenv("BING_PROXY_DM")
+	//var BING_SYDNEY_DOMAIN string 
+	//var BING_PROXY_RENDER string
+	//if os.Getenv("SYDNEY_PROXY_DM") != "" { BING_SYDNEY_DOMAIN = os.Getenv("SYDNEY_PROXY_DM") } else { BING_SYDNEY_DOMAIN = "https://sydney.bing.com" }
+	//if os.Getenv("BING_PROXY_DM") != "" { BING_PROXY_RENDER = os.Getenv("BING_PROXY_DM") } else { BING_PROXY_RENDER = "https://www.bing.com" }
+	//"https://rendcreate.onrender.com"
 	// BING_CHAT_URL, _ = url.Parse(BING_CHAT_DOMAIN + "/sydney/ChatHub")
 	BING_SYDNEY_URL, _  = url.Parse(BING_SYDNEY_DOMAIN)
-	BING_URL, _         = url.Parse("https://www.bing.com")
+	//BING_URL, _         = url.Parse("https://www.bing.com")
+	BING_URL, _         = url.Parse(BING_PROXY_RENDER)
 	EDGE_SVC_URL, _     = url.Parse("https://edgeservices.bing.com")
 	KEEP_REQ_HEADER_MAP = map[string]bool{
 		"Accept":                         true,
