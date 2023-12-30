@@ -60,7 +60,7 @@ var (
 		"X-Ms-Useragent":                 true,
 	}
 	DEL_LOCATION_DOMAINS = []string{
-		"https://cn.bing.com",
+		"https://www.bing.com",
 		"https://www.bing.com",
 	}
 	USER_TOKEN_COOKIE_NAME          = "_U"
