@@ -43,7 +43,7 @@ try {
 }
 _G = {
   Region: 'US',
-  Lang: 'zh-CN',
+  Lang: 'en-US',
   ST: typeof si_ST !== 'undefined' ? si_ST : new Date(),
   Mkt: 'en-US',
   RevIpCC: 'us',
@@ -95,9 +95,18 @@ function UserStoreGet (name) {
 
 function randomLowercaseString(e) {    
   e = e || 32;
-  var t = "abcdefhijkmnprstwxyz2345678",
+  var t = "abcdefhijkmnprstwxyz123456789",
   a = t.length,
   n = "";
   for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
   return n
 }
+
+function randomString(e) {    
+    e = e || 32;
+    var t = "abcdefhijkmnprstwxyzABCDEFHIJKMNPRSTWXYZ123456789",
+    a = t.length,
+    n = "";
+    for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+    return n
+  }

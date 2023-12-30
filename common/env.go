@@ -34,13 +34,6 @@ func initEnv() {
 	USER_KievRPSSecAuth = os.Getenv("USER_KievRPSSecAuth")
 	// MUID Cookie
 	USER_MUID = os.Getenv("USER_MUID")
-	//if USER_MUID == "" {
-	//	IPSTR := MUID_ADDRESSES[rand.Intn(len(MUID_ADDRESSES))]
-	//	trimmedIPStr := IPSTR[:len(IPSTR)-2]
-	//	randomString := generateRandomString(2)
-	//	USER_MUID = trimmedIPStr + randomString
-	//}
-
 	// _RwBf Cookie
 	USER_RwBf = os.Getenv("USER_RwBf")
 }

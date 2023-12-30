@@ -1,8 +1,13 @@
+import { brotli_decode } from "./bjs.js"
 // 同查找 _U 一样, 查找 KievRPSSecAuth 的值并替换下方的xxx
 const KievRPSSecAuth = '';
 const _RwBf = '';
 const MUID = '';
 const _U = '';
+
+const WEB_CONFIG = {
+  WORKER_URL: '', // 如无特殊需求请，保持为''
+};
 
 const SYDNEY_ORIGIN = 'https://sydney.bing.com';
 const BING_ORIGIN = 'https://www.bing.com';
@@ -110,12 +115,37 @@ const getRandomIP = () => {
  * @param {number} e
  * @returns
  */
-const randomString = (e) => {    
+const randomString = (e) => {
   e = e || 32;
   const t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678_-+";
   var n = "";
   for (let i = 0; i < e; i++) n += t.charAt(getRandomInt(0, t.length));
   return n;
+}
+
+const rewriteBody = async (res) => {
+    const content_type = res.headers.get("Content-Type") || "";
+    const content_encoding = res.headers.get("Content-Encoding") || "";
+    let encoding = null;
+    let body = res.body;
+    if (content_type.startsWith("text/html")) {
+      body = res.body;
+    } else if (res.url.endsWith("js")) {
+      if (res.url.includes('/rp/')) {
+        let decodedContent = null;
+        if (content_encoding == 'br') {
+          decodedContent = new TextDecoder("utf-8").decode(brotli_decode(new Int8Array(await res.clone().arrayBuffer())));
+          encoding = 'gzip';
+        } else {
+          decodedContent = new TextDecoder("utf-8").decode(new Int8Array(await res.clone().arrayBuffer()));
+        }
+        if (decodedContent) {
+          // @ts-ignore
+          body = decodedContent.replaceAll("www.bing.com", WEB_CONFIG.WORKER_URL.replace("http://", "").replace("https://", ""));
+        }
+      }
+    }
+   return {body, encoding};
 }
 
 /**
@@ -132,7 +162,8 @@ const home = async (pathname) => {
     url = baseUrl + 'web/index.html';
   }
   const res = await fetch(url);
-  const newRes = new Response(res.body, res);
+  const result = await rewriteBody(res);
+  const newRes = new Response(result.body, res);
   if (pathname.endsWith('.js')) {
     newRes.headers.set('content-type', 'application/javascript');
   } else if (pathname.endsWith('.css')) {
@@ -148,7 +179,6 @@ const home = async (pathname) => {
   return newRes;
 };
 
-
 export default {
   /**
    * fetch
@@ -159,6 +189,9 @@ export default {
    */
   async fetch (request, env, ctx) {
     const currentUrl = new URL(request.url);
+    if (WEB_CONFIG.WORKER_URL == '') {
+        WEB_CONFIG.WORKER_URL = currentUrl.origin;
+    }
     // if (currentUrl.pathname === '/' || currentUrl.pathname.startsWith('/github/')) {
     if (currentUrl.pathname === '/' || currentUrl.pathname.indexOf('/web/') === 0) {
       return home(currentUrl.pathname);
@@ -181,13 +214,32 @@ export default {
       }
     });
     newHeaders.set('host', targetUrl.host);
-    newHeaders.set('origin', targetUrl.origin);
-    newHeaders.set('referer', 'https://www.bing.com/search?q=Bing+AI');
+    newHeaders.set('origin', BING_ORIGIN);
+    if (request.headers.has('referer')) {
+      if (request.headers.get('referer').indexOf('web/compose.html') != -1) {
+        newHeaders.set('referer', 'https://edgeservices.bing.com/edgesvc/compose');
+      }
+    } else {
+      newHeaders.set('referer', 'https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx');
+    }
     const randIP = getRandomIP();
     // console.log('randIP : ', randIP);
     newHeaders.set('X-Forwarded-For', randIP);
     const cookie = request.headers.get('Cookie') || '';
     let cookies = cookie;
+
+    if (currentUrl.pathname === '/pass') {
+      let res = JSON.parse(await request.text())
+      targetUrl = res['url'];
+      newHeaders.set('origin', res['url']);
+      const newReq = new Request(targetUrl, {
+        method: request.method,
+        headers: newHeaders,
+        body: '{"cookies":"'+ cookies +'"}',
+      });
+      return await fetch(newReq);
+    }
+
     if (!cookie.includes('KievRPSSecAuth=')) {
       if (KievRPSSecAuth.length !== 0) {
         cookies += '; KievRPSSecAuth=' + KievRPSSecAuth;
@@ -203,21 +255,21 @@ export default {
       }
     }
     if (!cookie.includes('MUID=')) {
-        if (_RwBf.length !== 0) {
-          cookies += '; MUID=' + _RwBf
+        if (MUID.length !== 0) {
+          cookies += '; MUID=' + MUID
         } else {
           cookies += '; MUID=' + randomString(256);
         }
       }
     if (!cookie.includes('_U=')) {
       if (_U.length !== 0) {
-        cookies += '; _U=' + _RwBf
+        cookies += '; _U=' + _U;
       } else {
         cookies += '; _U=' + randomString(128);
       }
     }
     newHeaders.set('Cookie', cookies);
-    const oldUA = request.headers.get('user-agent');
+    const oldUA = request.headers.get('user-agent') || '';
     const isMobile = oldUA.includes('Mobile') || oldUA.includes('Android');
     if (isMobile) {
       newHeaders.set(
@@ -234,9 +286,12 @@ export default {
       headers: newHeaders,
       body: request.body,
     });
+
     // console.log('request url : ', newReq.url);
     const res = await fetch(newReq);
-    const newRes = new Response(res.body, res);
+    const result = await rewriteBody(res);
+    const newRes = new Response(result.body, res);
+    result.encoding && newRes.headers.set("Content-Encoding", result.encoding);
     newRes.headers.set('Access-Control-Allow-Origin', request.headers.get('Origin'));
     newRes.headers.set('Access-Control-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
     newRes.headers.set('Access-Control-Allow-Credentials', 'true');
