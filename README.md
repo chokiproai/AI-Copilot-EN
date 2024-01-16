@@ -40,6 +40,8 @@
 
 ![BING_COOKIE](https://cdn-uploads.huggingface.co/production/uploads/65126d4afdba96cc3c3e7498/WMjxkZs20Y3UyC2RDyfT3.png)
 
+#### Or use: https://ngoctuanai-getbingcookies.hf.space
+
 ## All
 - [x] Compose
 - [x] Vue3 refactoring
