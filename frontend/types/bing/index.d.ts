@@ -184,6 +184,10 @@ declare const CIB: {
        * PC 是否显示  get shouldShowPanel
        */
       isVisibleDesktop: boolean;
+      /**
+       * 选择的面板 threads / plugins
+       */
+      selectedPanel: string;
     };
     /**
      * 选择对话样式
