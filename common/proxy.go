@@ -21,18 +21,9 @@ import (
 
 var (
 	BING_SYDNEY_DOMAIN = "https://sydney.bing.com"
-	//BING_SYDNEY_DOMAIN = os.Getenv("SYDNEY_PROXY_DM")
-	BING_PROXY_RENDER = "https://proxybing.vercel.app"
-	//BING_PROXY_RENDER = os.Getenv("BING_PROXY_DM")
-	//var BING_SYDNEY_DOMAIN string 
-	//var BING_PROXY_RENDER string
-	//if os.Getenv("SYDNEY_PROXY_DM") != "" { BING_SYDNEY_DOMAIN = os.Getenv("SYDNEY_PROXY_DM") } else { BING_SYDNEY_DOMAIN = "https://sydney.bing.com" }
-	//if os.Getenv("BING_PROXY_DM") != "" { BING_PROXY_RENDER = os.Getenv("BING_PROXY_DM") } else { BING_PROXY_RENDER = "https://www.bing.com" }
-	//"https://rendcreate.onrender.com"
 	// BING_CHAT_URL, _ = url.Parse(BING_CHAT_DOMAIN + "/sydney/ChatHub")
 	BING_SYDNEY_URL, _  = url.Parse(BING_SYDNEY_DOMAIN)
-	//BING_URL, _         = url.Parse("https://www.bing.com")
-	BING_URL, _         = url.Parse(BING_PROXY_RENDER)
+	BING_URL, _         = url.Parse("https://www.bing.com")
 	EDGE_SVC_URL, _     = url.Parse("https://edgeservices.bing.com")
 	KEEP_REQ_HEADER_MAP = map[string]bool{
 		"Accept":                         true,
@@ -113,25 +104,30 @@ func NewSingleHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
 		req.Header.Set("X-Forwarded-For", randIP)
 
 		ckUserMUID, _ := req.Cookie(User_MUID_COOKIE_NAME)
-		if ckUserMUID == nil || ckUserMUID.Value == "" {
-			if USER_MUID != "" {
-				// 添加 MUID Cookie
-				req.AddCookie(&http.Cookie{
-					Name:  User_MUID_COOKIE_NAME,
-					Value: USER_MUID,
-				})
-			}
+		if (ckUserMUID == nil || ckUserMUID.Value == "") && USER_MUID != "" {
+			// 添加 MUID Cookie
+			req.AddCookie(&http.Cookie{
+				Name:  User_MUID_COOKIE_NAME,
+				Value: USER_MUID,
+			})
 		}
 
 		ckUserKievRPSSecAuth, _ := req.Cookie(USER_KievRPSSecAuth_COOKIE_NAME)
-		if ckUserKievRPSSecAuth == nil || ckUserKievRPSSecAuth.Value == "" {
-			if USER_KievRPSSecAuth != "" {
-				// 添加 KievRPSSecAuth Cookie
-				req.AddCookie(&http.Cookie{
-					Name:  USER_KievRPSSecAuth_COOKIE_NAME,
-					Value: USER_KievRPSSecAuth,
-				})
-			}
+		if (ckUserKievRPSSecAuth == nil || ckUserKievRPSSecAuth.Value == "") && USER_KievRPSSecAuth != "" {
+			// 添加 KievRPSSecAuth Cookie
+			req.AddCookie(&http.Cookie{
+				Name:  USER_KievRPSSecAuth_COOKIE_NAME,
+				Value: USER_KievRPSSecAuth,
+			})
+		}
+
+		ckUserRwBf, _ := req.Cookie(USER_RwBf_COOKIE_NAME)
+		if (ckUserRwBf == nil || ckUserRwBf.Value == "") && USER_RwBf != "" {
+			// 添加 RwBf Cookie
+			req.AddCookie(&http.Cookie{
+				Name:  USER_RwBf_COOKIE_NAME,
+				Value: USER_RwBf,
+			})
 		}
 
 		// 未登录用户
@@ -151,25 +147,14 @@ func NewSingleHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
 			// }
 		}
 
-		ckUserRwBf, _ := req.Cookie(USER_RwBf_COOKIE_NAME)
-		if ckUserRwBf == nil || ckUserRwBf.Value == "" {
-			if USER_RwBf != "" {
-				// 添加 RwBf Cookie
-				req.AddCookie(&http.Cookie{
-					Name:  USER_RwBf_COOKIE_NAME,
-					Value: USER_RwBf,
-				})
-			}
-		}
-
 		ua := req.UserAgent()
 		isMobile := strings.Contains(ua, "Mobile") || strings.Contains(ua, "Android")
 
 		// m pc 画图大小不一样
 		if isMobile {
-			req.Header.Set("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.7 Mobile/15E148 Safari/605.1.15 BingSapphire/1.0.410529013")
+			req.Header.Set("User-Agent", User_Agent_Mobile)
 		} else {
-			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.55")
+			req.Header.Set("User-Agent", User_Agent)
 		}
 
 		for hKey := range req.Header {
