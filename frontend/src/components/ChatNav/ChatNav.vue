@@ -28,7 +28,7 @@ const chatStore = useChatStore();
 const { isShowChatServiceSelectModal } = storeToRefs(chatStore);
 const userStore = useUserStore();
 const localVersion = __APP_INFO__.version;
-const lastVersion = ref('加载中...');
+const lastVersion = ref('...');
 const { historyEnable, themeMode, fullCookiesEnable, cookiesStr, enterpriseEnable, customChatNum, gpt4tEnable, sydneyEnable, sydneyPrompt, passServer } = storeToRefs(userStore)
 let cookiesEnable = ref(false);
 let cookies = ref('');
@@ -47,7 +47,7 @@ const sydneyPromptSetting = ref('');
 const passServerSetting = ref('');
 
 const GetLastVersion = async () => {
-  const res = await fetch('https://api.github.com/repos/Harry-zklcdc/go-proxy-bingai/releases/latest');
+  const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot-EN/releases/latest');
   const json = await res.json();
   lastVersion.value = json.tag_name;
 };
@@ -65,51 +65,34 @@ const navType = {
 };
 const navConfigs = [
   {
-    key: navType.setting,
-    label: '设置',
-  },
-  {
-    key: navType.chatService,
-    label: '服务选择',
-  },
-  {
     key: navType.promptStore,
-    label: '提示词库',
-  },
-  {
-    key: navType.compose,
-    label: '撰写文章',
-    url: '/web/compose.html',
-  },
-  {
-    key: navType.createImage,
-    label: '图像创建',
-  },
-  {
+    label: 'Prompt Store',
+},
+{
     key: navType.advancedSetting,
-    label: '高级设置',
-  },
-  {
+    label: 'Advanced Settings',
+},
+{
     key: navType.reset,
-    label: '一键重置',
-  },
-  {
+    label: 'Reset All',
+},
+{
     key: navType.about,
-    label: '关于'
-  },
+    label: 'About'
+},
 ];
 
 const themeModeOptions = ref([
-  {
-    label: '浅色',
+{
+    label: 'Light Mode',
     value: 'light',
-  }, {
-    label: '深色',
+}, {
+    label: 'Dark Mode',
     value: 'dark',
-  }, {
-    label: '跟随系统',
+}, {
+    label: 'System Default',
     value: 'auto',
-  }
+}
 ]);
 
 onMounted(() => {
@@ -173,14 +156,14 @@ const handleSelect = (key: string) => {
         passServerSetting.value = passServer.value;
       }
       break;
-    case navType.createImage:
-      {
-        if (!userStore.sysConfig?.isSysCK && !userStore.getUserToken()) {
-          message.warning('体验画图功能需先登录');
-        }
-        isShowCreateImageModal.value = true;
+      case navType.createImage:
+  {
+      if (!userStore.sysConfig?.isSysCK && !userStore.getUserToken()) {
+          message.warning('You need to log in first to use the image drawing function');
       }
-      break;
+      isShowCreateImageModal.value = true;
+  }
+  break;
     case navType.reset:
       {
         isShowClearCacheModal.value = true;
@@ -199,7 +182,7 @@ const handleSelect = (key: string) => {
 const resetCache = async () => {
   isShowClearCacheModal.value = false;
   await userStore.resetCache();
-  message.success('清理完成');
+  message.success('Cleanup completed');
   window.location.href = '/';
 };
 
@@ -296,131 +279,130 @@ const autoPassCFChallenge = async () => {
     }),
   }).then((res) => res.json())
   .catch(() => {
-    message.error('人机验证失败, 请重试');
-    passingCFChallenge.value = false;
+      message.error('Robot verification failed, please try again');
+      passingCFChallenge.value = false;
   })
   if (resq['result'] != null && resq['result'] != undefined) {
     userStore.saveCookies(resq['result']['cookies']);
     cookiesStr.value = resq['result']['cookies'];
-    message.success('自动通过人机验证成功');
+    message.success('Automatically passed robot verification successfully');
     passingCFChallenge.value = false;
     window.location.href = '/';
-  } else {
-    message.error('人机验证失败, 请重试');
+} else {
+    message.error('Robot verification failed, please try again');
     passingCFChallenge.value = false;
-  }
+}
 }
 </script>
+
 
 <template>
   <NConfigProvider :theme="theme">
     <NDropdown v-if="isMobile()" class="select-none" :show="isShowMore" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="设置菜单" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
+      <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings Menu" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
     </NDropdown>
     <NDropdown v-else class="select-none" trigger="hover" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="设置菜单" :preview-disabled="true" :style="settingIconStyle"></NImage>
+      <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings Menu" :preview-disabled="true" :style="settingIconStyle"></NImage>
     </NDropdown>
     <NModal v-model:show="isShowSettingModal" preset="dialog" :show-icon="false">
       <template #header>
-        <div class="text-3xl py-2">设置</div>
+        <div class="text-3xl py-2">Settings</div>
       </template>
       <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging" style="margin-top: 16px;">
-        <NFormItem path="cookiesEnable" label="自动人机验证">
-          <NButton type="info" :loading="passingCFChallenge" @click="autoPassCFChallenge">启动</NButton>
+        <NFormItem path="cookiesEnable" label="Automatic Robot Verification">
+          <NButton type="info" :loading="passingCFChallenge" @click="autoPassCFChallenge">Start</NButton>
         </NFormItem>
-        <NFormItem path="cookiesEnable" label="完整 Cookie">
-          <NSwitch v-model:value="cookiesEnable" />
-        </NFormItem>
-        <NFormItem v-show="!cookiesEnable" path="token" label="Token">
-          <NInput size="large" v-model:value="userToken" type="text" placeholder="用户 Cookie ,仅需要 _U 的值" />
-        </NFormItem>
-        <NFormItem v-show="!cookiesEnable" path="token" label="KievRPSSecAuth">
-          <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="用户 Cookie ,仅需要 KievRPSSecAuth 的值" />
-        </NFormItem>
-        <NFormItem v-show="!cookiesEnable" path="token" label="_RwBf">
-          <NInput size="large" v-model:value="userRwBf" type="text" placeholder="用户 Cookie ,仅需要 _RwBf 的值" />
-        </NFormItem>
-        <NFormItem v-show="!cookiesEnable" path="token" label="MUID">
-          <NInput size="large" v-model:value="userMUID" type="text" placeholder="用户 Cookie ,仅需要 MUID 的值" />
-        </NFormItem>
-        <NFormItem v-show="cookiesEnable" path="token" label="Cookies">
-          <NInput size="large" v-model:value="cookies" type="text" placeholder="完整用户 Cookie" />
-        </NFormItem>
+        <NFormItem path="cookiesEnable" label="Complete Cookie">
+  <NSwitch v-model:value="cookiesEnable" />
+  </NFormItem>
+  <NFormItem v-show="!cookiesEnable" path="token" label="Token">
+    <NInput size="large" v-model:value="userToken" type="text" placeholder="User cookie, only need the value of _U" />
+  </NFormItem>
+  <NFormItem v-show="!cookiesEnable" path="token" label="KievRPSSecAuth">
+    <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="User cookie, only need the value of KievRPSSecAuth" />
+  </NFormItem>
+  <NFormItem v-show="!cookiesEnable" path="token" label="_RwBf">
+    <NInput size="large" v-model:value="userRwBf" type="text" placeholder="User cookie, only need the value of _RwBf" />
+  </NFormItem>
+  <NFormItem v-show="!cookiesEnable" path="token" label="MUID">
+    <NInput size="large" v-model:value="userMUID" type="text" placeholder="User cookie, only need the value of MUID" />
+  </NFormItem>
+  <NFormItem v-show="cookiesEnable" path="token" label="Cookies">
+    <NInput size="large" v-model:value="cookies" type="text" placeholder="Complete user cookie" />
+  </NFormItem>
+  </NForm>
+      <template #action>
+  <NButton size="large" @click="isShowSettingModal = false">Cancel</NButton>
+  <NButton ghost size="large" type="info" @click="saveSetting">Save</NButton>
+</template>
+</NModal>
+<NModal v-model:show="isShowAdvancedSettingModal" preset="dialog" :show-icon="false">
+  <template #header>
+    <div class="text-3xl py-2">Advanced Settings</div>
+  </template>
+  <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging"
+    style="margin-top: 16px;">
+    <NFormItem path="history" label="History">
+      <NSwitch v-model:value="history" />
+    </NFormItem>
+    <NFormItem path="enterpriseEnable" label="Enterprise Version">
+      <NSwitch v-model:value="enterpriseSetting" />
+    </NFormItem>
+    <NFormItem path="gpt4tEnable" label="GPT4 Turbo">
+      <NSwitch v-model:value="gpt4tSetting" />
+    </NFormItem>
+    <NFormItem path="sydneyEnable" label="Jailbreak Mode">
+      <NSwitch v-model:value="sydneySetting" />
+    </NFormItem>
+    <NFormItem path="sydneyPrompt" label="Robot Verification Server">
+      <NInput size="large" v-model:value="passServerSetting" type="text" placeholder="Robot Verification Server" />
+    </NFormItem>
+    <NFormItem path="sydneyPrompt" label="Prompt Word">
+      <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="Prompt word for Jailbreak mode" />
+    </NFormItem>
+    <NFormItem path="themeMode" label="Theme Mode">
+      <NSelect v-model:value="themeModeSetting" :options="themeModeOptions" size="large" placeholder="Please select a theme mode" />
+    </NFormItem>
+    <NFormItem v-show="!cookiesEnable" path="customChatNum" label="Number of Chats">
+      <NInputNumber size="large" v-model:value="customChatNumSetting" min="0" style="width: 100%;"/>
+    </NFormItem>
       </NForm>
       <template #action>
-        <NButton size="large" @click="isShowSettingModal = false">取消</NButton>
-        <NButton ghost size="large" type="info" @click="saveSetting">保存</NButton>
-      </template>
-    </NModal>
-    <NModal v-model:show="isShowAdvancedSettingModal" preset="dialog" :show-icon="false">
-      <template #header>
-        <div class="text-3xl py-2">高级设置</div>
-      </template>
-      <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging"
-        style="margin-top: 16px;">
-        <NFormItem path="history" label="历史记录">
-          <NSwitch v-model:value="history" />
-        </NFormItem>
-        <NFormItem path="enterpriseEnable" label="企业版">
-          <NSwitch v-model:value="enterpriseSetting" />
-        </NFormItem>
-        <NFormItem path="gpt4tEnable" label="GPT4 Turbo">
-          <NSwitch v-model:value="gpt4tSetting" />
-        </NFormItem>
-        <NFormItem path="sydneyEnable" label="越狱模式">
-          <NSwitch v-model:value="sydneySetting" />
-        </NFormItem>
-        <NFormItem path="sydneyPrompt" label="人机验证服务器">
-          <NInput size="large" v-model:value="passServerSetting" type="text" placeholder="人机验证服务器" />
-        </NFormItem>
-        <NFormItem path="sydneyPrompt" label="提示词">
-          <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="越狱模式提示词" />
-        </NFormItem>
-        <NFormItem path="themeMode" label="主题模式">
-          <NSelect v-model:value="themeModeSetting" :options="themeModeOptions" size="large" placeholder="请选择主题模式" />
-        </NFormItem>
-        <NFormItem v-show="!cookiesEnable" path="customChatNum" label="聊天次数">
-          <NInputNumber size="large" v-model:value="customChatNumSetting" min="0" style="width: 100%;"/>
-        </NFormItem>
-      </NForm>
-      <template #action>
-        <NButton size="large" @click="isShowAdvancedSettingModal = false">取消</NButton>
-        <NButton ghost size="large" type="info" @click="saveAdvancedSetting">保存</NButton>
-      </template>
-    </NModal>
-    <NModal v-model:show="isShowClearCacheModal" preset="dialog" :show-icon="false">
-      <template #header>
-        <div class="text-xl py-2">将删除包括 Cookie 等的所有缓存？</div>
-      </template>
-      <template #action>
-        <NButton size="large" @click="isShowClearCacheModal = false">取消</NButton>
-        <NButton ghost size="large" type="error" @click="resetCache">确定</NButton>
-      </template>
-    </NModal>
-    <NModal v-model:show="isShowSetAboutModal" preset="dialog" :show-icon="false">
-      <template #header>
-        <div class="text-3xl py-2">关于</div>
-      </template>
-      <NForm ref="formRef" label-placement="left" label-width="auto" size="small" style="margin-top: 16px;">
-        <NFormItem path="" label="版本号">
-          <NTag type="info" size="small" round>{{ 'v' + localVersion }}</NTag>
-        </NFormItem>
-        <NFormItem path="" label="最新版本">
-          <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
-        </NFormItem>
-        <NFormItem path="token" label="开源地址">
-          <NButton text tag="a" href="https://github.com/Harry-zklcdc/go-proxy-bingai" target="_blank" type="success">Harry-zklcdc/go-proxy-bingai</NButton>
-        </NFormItem>
-        <NFormItem path="token" label="原作者">
-          <NButton text tag="a" href="https://github.com/adams549659584" target="_blank" type="success">adams549659584</NButton>
-        </NFormItem>
-        <NFormItem path="token" label="原开源地址">
-          <NButton text tag="a" href="https://github.com/adams549659584/go-proxy-bingai" target="_blank" type="success">adams549659584/go-proxy-bingai</NButton>
-        </NFormItem>
-    </NForm>
+  <NButton size="large" @click="isShowAdvancedSettingModal = false">Cancel</NButton>
+  <NButton ghost size="large" type="info" @click="saveAdvancedSetting">Save</NButton>
+  </template>
+  </NModal>
+  <NModal v-model:show="isShowClearCacheModal" preset="dialog" :show-icon="false">
+    <template #header>
+      <div class="text-xl py-2">Are you sure you want to clear all cache including Cookies?</div>
+    </template>
     <template #action>
-      <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">确定</NButton>
+      <NButton size="large" @click="isShowClearCacheModal = false">Cancel</NButton>
+      <NButton ghost size="large" type="error" @click="resetCache">Agree</NButton>
     </template>
   </NModal>
+  <NModal v-model:show="isShowSetAboutModal" preset="dialog" :show-icon="false">
+    <template #header>
+      <div class="text-3xl py-2">About</div>
+    </template>
+    <NForm ref="formRef" label-placement="left" label-width="auto" size="small" style="margin-top: 16px;">
+      <NFormItem path="" label="Version">
+        <NTag type="info" size="small" round>{{ 'v' + localVersion }}</NTag>
+      </NFormItem>
+      <NFormItem path="" label="Latest Version">
+        <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
+      </NFormItem>
+      <NFormItem path="token" label="Open Source Address">
+        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot" target="_blank" type="success">chokiproai/AI-Copilot</NButton>
+      </NFormItem>
+      <NFormItem path="token" label="Author">
+        <NButton text tag="a" href="https://github.com/chokiproai" target="_blank" type="success">chokiproai</NButton>
+      </NFormItem>
+  </NForm>
+</template>
+<template #action>
+  <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">Yes</NButton>
+  </template>
+  </NModal>
   <CreateImage v-model:show="isShowCreateImageModal" />
-</NConfigProvider></template>
+  </NConfigProvider></template>

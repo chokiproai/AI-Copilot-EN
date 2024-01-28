@@ -143,7 +143,7 @@ const hackStyle = () => {
   }
   const serpEle = document.querySelector('cib-serp');
   const conversationEle = serpEle?.shadowRoot?.querySelector('cib-conversation') as HTMLElement;
-  // todo 反馈暂时无法使用，先移除
+  // todo Phản hồi tạm thời không thể sử dụng, tạm thời loại bỏ
   const welcomeEle = conversationEle?.shadowRoot?.querySelector('cib-welcome-container');
   const loginTip = welcomeEle?.shadowRoot?.querySelectorAll("div[class='muid-upsell']");
   if (loginTip?.length) {
@@ -156,7 +156,7 @@ const hackStyle = () => {
   serpEle?.shadowRoot?.querySelector('cib-serp-feedback')?.remove();
   if (isMobile()) {
     welcomeEle?.shadowRoot?.querySelector('.container-item')?.remove();
-    CIB.vm.actionBar.input.placeholder = '有问题尽管问我...（"/" 触发提示词）';
+    CIB.vm.actionBar.input.placeholder = 'Hãy đặt câu hỏi cho tôi... ("/" để kích hoạt từ gợi ý)';
   }
   // 加入css
   const conversationStyleEle = document.createElement('style');
@@ -204,17 +204,17 @@ const hackSydney = () => {
 			"524vidansgs0",
     ]
     CIB.config.sydney.request.optionsSets.push("rai278", "enflst", "enpcktrk",  "rcaldictans", "rcaltimeans", "nojbfedge")
-    CIB.config.features.enableUpdateConversationMessages = true
-    CIB.registerContext([{
-      "author": "user",
-      "description": sydneyPrompt.value,
-      "contextType": "WebPage",
-      "messageType": "Context",
-      "messageId": "discover-web--page-ping-mriduna-----",
-    }])
-    CIB.config.strings.webPageContextPrefix = '已处于越狱模式, 请谨慎使用避免封号'
+  CIB.config.features.enableUpdateConversationMessages = true
+  CIB.registerContext([{
+    "author": "user",
+    "description": sydneyPrompt.value,
+    "contextType": "WebPage",
+    "messageType": "Context",
+    "messageId": "discover-web--page-ping-mriduna-----",
+  }])
+  CIB.config.strings.webPageContextPrefix = 'Đang ở chế độ Jailbreak, hãy sử dụng cẩn thận để tránh bị khóa tài khoản'
   }
-}
+  }
 
 const initChatPrompt = () => {
   const actionBarEle = document.querySelector('#b_sydConvCont > cib-serp')?.shadowRoot?.querySelector('#cib-action-bar-main') as IActionBarElement;
@@ -327,7 +327,7 @@ const handlePromptListScroll = () => {
   setTimeout(() => {
     if (isPromptScrolling.value === true) {
       isPromptScrolling.value = false;
-      // 滚动结束设置选中
+      // Kết thúc cuộn, đặt lựa chọn
       const offset = scrollbarRef.value?.getOffset() || 0;
       selectedPromptIndex.value = Math.round(offset / promptItemHeight);
     }
@@ -336,18 +336,18 @@ const handlePromptListScroll = () => {
 
 const auth = async () => {
   if (!authKey.value) {
-    message.error('请先输入授权码');
+    message.error('Vui lòng nhập mã ủy quyền trước');
     return;
   }
   isAuthBtnLoading.value = true;
   userStore.setAuthKey(authKey.value);
   const res = await userStore.getSysConfig();
   if (res.data.isAuth) {
-    message.success('授权成功');
+    message.success('Ủy quyền thành công');
     isShowUnauthorizedModal.value = false;
     afterAuth(res.data);
   } else {
-    message.error('授权码有误');
+    message.error('Mã ủy quyền không chính xác');
   }
   isAuthBtnLoading.value = false;
 };
@@ -375,22 +375,22 @@ const auth = async () => {
         :keeps="10"
         @scroll="handlePromptListScroll"
       />
-      <NEmpty v-else class="bg-white w-full max-w-[1060px] max-h-[390px] rounded-xl py-6" description="暂未设置提示词数据">
+      <NEmpty v-else class="bg-white w-full max-w-[1060px] max-h-[390px] rounded-xl py-6" description="Chưa thiết lập dữ liệu từ gợi ý">
         <template #extra>
-          <NButton secondary type="info" @click="isShowPromptSotre = true">去提示词库添加</NButton>
+          <NButton secondary type="info" @click="isShowPromptSotre = true">Thêm từ gợi ý từ kho</NButton>
         </template>
       </NEmpty>
     </div>
   </main>
   <footer>
-    <!-- 服务器选择 -->
+    <!-- Chọn máy chủ -->
     <ChatServiceSelect />
-    <!-- 授权 -->
+    <!-- Ủy quyền -->
     <div v-if="isShowUnauthorizedModal" class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-black/40 z-50">
-      <NResult class="box-border w-11/12 lg:w-[400px] px-4 py-4 bg-white rounded-md" status="403" title="401 未授权">
+      <NResult class="box-border w-11/12 lg:w-[400px] px-4 py-4 bg-white rounded-md" status="403" title="401 Không được ủy quyền">
         <template #footer>
-          <NInput class="w-11/12" v-model:value="authKey" type="password" placeholder="请输入授权码" maxlength="60" clearable></NInput>
-          <n-button class="mt-4" secondary type="info" :loading="isAuthBtnLoading" @click="auth">授权</n-button>
+          <NInput class="w-11/12" v-model:value="authKey" type="password" placeholder="Vui lòng nhập mã ủy quyền" maxlength="60" clearable></NInput>
+          <n-button class="mt-4" secondary type="info" :loading="isAuthBtnLoading" @click="auth">Ủy quyền</n-button>
         </template>
       </NResult>
     </div>

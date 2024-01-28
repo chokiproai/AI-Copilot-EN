@@ -25,15 +25,9 @@ export const usePromptStore = defineStore(
     const promptDownloadConfig = ref<Array<IPromptDownloadConfig>>([
       {
         type: 1,
-        name: 'ChatGPT 中文调教指南 - 简体',
-        url: './data/prompts/prompts-zh.json',
-        refer: 'https://github.com/PlexPt/awesome-chatgpt-prompts-zh',
-      },
-      {
-        type: 1,
-        name: 'ChatGPT 中文调教指南 - 繁体',
-        url: './data/prompts/prompts-zh-TW.json',
-        refer: 'https://github.com/PlexPt/awesome-chatgpt-prompts-zh',
+        name: 'ChatGPT chatgpt-Prompt-vn',
+        url: './data/prompts/prompts-Vi.json',
+        refer: 'https://github.com/chokiproai/prompt/blob/main/vi.json',
       },
       {
         type: 1,
@@ -57,9 +51,9 @@ export const usePromptStore = defineStore(
     const optPromptConfig = ref<{
       isShow: boolean;
       type?: 'add' | 'edit';
-      title?: '添加提示词' | '编辑提示词';
+      title?: 'Add suggestion' | 'Edit suggestion';
       tmpPrompt?: IPrompt;
-      newPrompt: IPrompt;
+      newPrompt: IPrompt;    
     }>({
       isShow: false,
       newPrompt: {
@@ -67,14 +61,14 @@ export const usePromptStore = defineStore(
         prompt: '',
       },
     });
-
+    
     const searchPromptList = computed(() => {
       if (!keyword.value) {
         return promptList.value;
       }
       return promptList.value?.filter((x) => x.act.includes(keyword.value) || x.prompt.includes(keyword.value));
     });
-
+    
     function addPrompt(list: Array<IPrompt>): IOptPromptResult<{ successCount: number }> {
       if (list instanceof Array<IPrompt> && list.every((x) => x.act && x.prompt)) {
         if (promptList.value.length === 0) {
@@ -97,10 +91,10 @@ export const usePromptStore = defineStore(
       } else {
         return {
           result: false,
-          msg: '提示词格式有误',
-        };
+          msg: 'Suggestion format error',
+        };        
       }
-    }
+    }    
 
     return { promptDownloadConfig, isShowPromptSotre, isShowChatPrompt, promptList, keyword, searchPromptList, selectedPromptIndex, optPromptConfig, addPrompt };
   },

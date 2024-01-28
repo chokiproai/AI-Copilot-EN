@@ -1,5 +1,5 @@
 name: Bug Report
-description: 提交错误报告
+description: Submit a bug report
 title: "[Bug] 🐛 "
 labels:
   - bug
@@ -7,29 +7,29 @@ body:
   - type: textarea
     attributes:
       label: Describe the bug
-      description: 请简明地表述 bug 是什么。
+      description: Please describe briefly what the bug is.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Steps to reproduce
-      description: 请描述如何重现这个行为, 可以是操作顺序等。
+      description: Please describe how to reproduce this behavior, such as the order of operations.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Expected behavior
-      description: 请描述期望的行为。
+      description: Please describe the expected behavior.
     validations:
       required: true
   - type: textarea
     attributes:
       label: Screenshots
-      description: 请尽量详细地提供相关截图，可以是聊天记录、控制台日志和服务端日志、数据包内容等。
+      description: Please provide relevant screenshots as detailed as possible, such as chat records, console logs, server logs, packet content, etc.
   - type: textarea
     attributes:
       label: Versions
-      description: 请填写相应的版本号。
+      description: Please fill in the corresponding version numbers.
       value: |
         - OS: <!-- e.g. Windows 10 -->
         - Browser & Version: <!-- e.g. Chrome 115 -->
@@ -39,4 +39,4 @@ body:
   - type: textarea
     attributes:
       label: Additional context
-      description: 请描述其他想要补充的信息。
+      description: Please describe any additional information you want to add.
