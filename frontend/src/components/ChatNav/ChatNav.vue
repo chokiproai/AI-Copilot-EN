@@ -47,7 +47,7 @@ const sydneyPromptSetting = ref('');
 const passServerSetting = ref('');
 
 const GetLastVersion = async () => {
-  const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot-EN/releases/latest');
+  const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot/releases/latest');
   const json = await res.json();
   lastVersion.value = json.tag_name;
 };
@@ -66,7 +66,7 @@ const navType = {
 const navConfigs = [
   {
     key: navType.promptStore,
-    label: 'Prompt Store',
+    label: 'Suggestion Store',
 },
 {
     key: navType.advancedSetting,
@@ -84,13 +84,13 @@ const navConfigs = [
 
 const themeModeOptions = ref([
 {
-    label: 'Light Mode',
+    label: 'Light Color',
     value: 'light',
 }, {
-    label: 'Dark Mode',
+    label: 'Dark Color',
     value: 'dark',
 }, {
-    label: 'System Default',
+    label: 'Follow System',
     value: 'auto',
 }
 ]);
@@ -156,14 +156,14 @@ const handleSelect = (key: string) => {
         passServerSetting.value = passServer.value;
       }
       break;
-      case navType.createImage:
-  {
-      if (!userStore.sysConfig?.isSysCK && !userStore.getUserToken()) {
-          message.warning('You need to log in first to use the image drawing function');
+    case navType.createImage:
+      {
+        if (!userStore.sysConfig?.isSysCK && !userStore.getUserToken()) {
+          message.warning('Need to log in first to experience the drawing function');
+        }
+        isShowCreateImageModal.value = true;
       }
-      isShowCreateImageModal.value = true;
-  }
-  break;
+      break;
     case navType.reset:
       {
         isShowClearCacheModal.value = true;
@@ -192,22 +192,22 @@ const saveSetting = () => {
     cookiesStr.value = cookies.value;
   } else {
     if (!userToken.value) {
-      message.warning('请先填入用户 _U Cookie');
+      message.warning('Please fill in the user _U Cookie first');
     } else {
       userStore.saveUserToken(userToken.value);
     }
     if (!userKievRPSSecAuth.value) {
-      message.warning('请先填入用户 KievRPSSecAuth Cookie');
+      message.warning('Please fill in the user KievRPSSecAuth Cookie first');
     } else {
       userStore.saveUserKievRPSSecAuth(userKievRPSSecAuth.value);
     }
     if (!userRwBf.value) {
-      message.warning('请先填入用户 _RwBf Cookie');
+      message.warning('Please fill in the user _RwBf Cookie first');
     } else {
       userStore.saveUserRwBf(userRwBf.value);
     }
     if (!userMUID.value) {
-      message.warning('请先填入用户 MUID Cookie');
+      message.warning('Please fill in the user MUID Cookie first');
     } else {
       userStore.saveUserMUID(userMUID.value);
     }
@@ -279,19 +279,19 @@ const autoPassCFChallenge = async () => {
     }),
   }).then((res) => res.json())
   .catch(() => {
-      message.error('Robot verification failed, please try again');
-      passingCFChallenge.value = false;
+    message.error('Robot verification failed, please try again');
+    passingCFChallenge.value = false;
   })
   if (resq['result'] != null && resq['result'] != undefined) {
     userStore.saveCookies(resq['result']['cookies']);
     cookiesStr.value = resq['result']['cookies'];
-    message.success('Automatically passed robot verification successfully');
+    message.success('Automatically bypass robot verification successful');
     passingCFChallenge.value = false;
     window.location.href = '/';
-} else {
+  } else {
     message.error('Robot verification failed, please try again');
     passingCFChallenge.value = false;
-}
+  }
 }
 </script>
 
@@ -299,36 +299,36 @@ const autoPassCFChallenge = async () => {
 <template>
   <NConfigProvider :theme="theme">
     <NDropdown v-if="isMobile()" class="select-none" :show="isShowMore" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings Menu" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
+      <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="Setting menu" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
     </NDropdown>
     <NDropdown v-else class="select-none" trigger="hover" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings Menu" :preview-disabled="true" :style="settingIconStyle"></NImage>
+      <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="Setting menu" :preview-disabled="true" :style="settingIconStyle"></NImage>
     </NDropdown>
     <NModal v-model:show="isShowSettingModal" preset="dialog" :show-icon="false">
       <template #header>
         <div class="text-3xl py-2">Settings</div>
       </template>
       <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging" style="margin-top: 16px;">
-        <NFormItem path="cookiesEnable" label="Automatic Robot Verification">
+        <NFormItem path="cookiesEnable" label="Automatic robot verification">
           <NButton type="info" :loading="passingCFChallenge" @click="autoPassCFChallenge">Start</NButton>
         </NFormItem>
         <NFormItem path="cookiesEnable" label="Complete Cookie">
   <NSwitch v-model:value="cookiesEnable" />
   </NFormItem>
   <NFormItem v-show="!cookiesEnable" path="token" label="Token">
-    <NInput size="large" v-model:value="userToken" type="text" placeholder="User cookie, only need the value of _U" />
+    <NInput size="large" v-model:value="userToken" type="text" placeholder="User Cookie, just need the value of _U" />
   </NFormItem>
   <NFormItem v-show="!cookiesEnable" path="token" label="KievRPSSecAuth">
-    <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="User cookie, only need the value of KievRPSSecAuth" />
+    <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="User Cookie, just need the value of KievRPSSecAuth" />
   </NFormItem>
   <NFormItem v-show="!cookiesEnable" path="token" label="_RwBf">
-    <NInput size="large" v-model:value="userRwBf" type="text" placeholder="User cookie, only need the value of _RwBf" />
+    <NInput size="large" v-model:value="userRwBf" type="text" placeholder="User Cookie, just need the value of _RwBf" />
   </NFormItem>
   <NFormItem v-show="!cookiesEnable" path="token" label="MUID">
-    <NInput size="large" v-model:value="userMUID" type="text" placeholder="User cookie, only need the value of MUID" />
+    <NInput size="large" v-model:value="userMUID" type="text" placeholder="User Cookie, just need the value of MUID" />
   </NFormItem>
   <NFormItem v-show="cookiesEnable" path="token" label="Cookies">
-    <NInput size="large" v-model:value="cookies" type="text" placeholder="Complete user cookie" />
+    <NInput size="large" v-model:value="cookies" type="text" placeholder="Complete User Cookie" />
   </NFormItem>
   </NForm>
       <template #action>
@@ -357,8 +357,8 @@ const autoPassCFChallenge = async () => {
     <NFormItem path="sydneyPrompt" label="Robot Verification Server">
       <NInput size="large" v-model:value="passServerSetting" type="text" placeholder="Robot Verification Server" />
     </NFormItem>
-    <NFormItem path="sydneyPrompt" label="Prompt Word">
-      <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="Prompt word for Jailbreak mode" />
+    <NFormItem path="sydneyPrompt" label="Suggestion Word">
+      <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="Jailbreak Mode Suggestion Word" />
     </NFormItem>
     <NFormItem path="themeMode" label="Theme Mode">
       <NSelect v-model:value="themeModeSetting" :options="themeModeOptions" size="large" placeholder="Please select a theme mode" />
@@ -374,7 +374,7 @@ const autoPassCFChallenge = async () => {
   </NModal>
   <NModal v-model:show="isShowClearCacheModal" preset="dialog" :show-icon="false">
     <template #header>
-      <div class="text-xl py-2">Are you sure you want to clear all cache including Cookies?</div>
+      <div class="text-xl py-2">Are you sure you want to delete all cache including Cookies?</div>
     </template>
     <template #action>
       <NButton size="large" @click="isShowClearCacheModal = false">Cancel</NButton>
@@ -399,10 +399,10 @@ const autoPassCFChallenge = async () => {
         <NButton text tag="a" href="https://github.com/chokiproai" target="_blank" type="success">chokiproai</NButton>
       </NFormItem>
   </NForm>
-</template>
 <template #action>
-  <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">Yes</NButton>
+  <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">Agree</NButton>
   </template>
   </NModal>
   <CreateImage v-model:show="isShowCreateImageModal" />
-  </NConfigProvider></template>
+  </NConfigProvider>
+</template>
