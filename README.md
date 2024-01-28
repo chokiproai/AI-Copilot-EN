@@ -3,7 +3,8 @@
 # Original project 
 > Vietnamese language: https://github.com/chokiproai/AI-Copilot
 
-## [Deploy on Hugging Face](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4en%3Fduplicate%3Dtrue)
+## 🤗 Hugging Face
+> ## [![Deploy on Hugging Face](https://huggingface.co/datasets/huggingface/badges/raw/main/deploy-on-spaces-md.svg)](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4en%3Fduplicate%3Dtrue)
 
 ## Introduce
 - ⭐ Based on Microsoft New Bing, a Microsoft New Bing website custom built using Vue3 and Go. It provides a consistent user interface experience, supports ChatGPT prompts, and is essentially compatible with all features of Microsoft Bing AI. You don't need to log in to chat.
