@@ -47,7 +47,7 @@ const sydneyPromptSetting = ref('');
 const passServerSetting = ref('');
 
 const GetLastVersion = async () => {
-  const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot/releases/latest');
+  const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot-EN/releases/latest');
   const json = await res.json();
   lastVersion.value = json.tag_name;
 };
@@ -393,7 +393,7 @@ const autoPassCFChallenge = async () => {
         <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
       </NFormItem>
       <NFormItem path="token" label="Open Source Address">
-        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot" target="_blank" type="success">chokiproai/AI-Copilot</NButton>
+        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot-EN" target="_blank" type="success">chokiproai/AI-Copilot</NButton>
       </NFormItem>
       <NFormItem path="token" label="Author">
         <NButton text tag="a" href="https://github.com/chokiproai" target="_blank" type="success">chokiproai</NButton>

@@ -143,7 +143,7 @@ const hackStyle = () => {
   }
   const serpEle = document.querySelector('cib-serp');
   const conversationEle = serpEle?.shadowRoot?.querySelector('cib-conversation') as HTMLElement;
-  // todo Phản hồi tạm thời không thể sử dụng, tạm thời loại bỏ
+  // todo Feedback currently cannot be used, temporarily removed
   const welcomeEle = conversationEle?.shadowRoot?.querySelector('cib-welcome-container');
   const loginTip = welcomeEle?.shadowRoot?.querySelectorAll("div[class='muid-upsell']");
   if (loginTip?.length) {
@@ -156,9 +156,9 @@ const hackStyle = () => {
   serpEle?.shadowRoot?.querySelector('cib-serp-feedback')?.remove();
   if (isMobile()) {
     welcomeEle?.shadowRoot?.querySelector('.container-item')?.remove();
-    CIB.vm.actionBar.input.placeholder = 'Hãy đặt câu hỏi cho tôi... ("/" để kích hoạt từ gợi ý)';
+    CIB.vm.actionBar.input.placeholder = 'Ask me a question... ("/" to activate suggestions)';
   }
-  // 加入css
+  // Add css
   const conversationStyleEle = document.createElement('style');
   conversationStyleEle.innerText = conversationCssText;
   conversationEle.shadowRoot?.append(conversationStyleEle);
@@ -212,7 +212,7 @@ const hackSydney = () => {
     "messageType": "Context",
     "messageId": "discover-web--page-ping-mriduna-----",
   }])
-  CIB.config.strings.webPageContextPrefix = 'Đang ở chế độ Jailbreak, hãy sử dụng cẩn thận để tránh bị khóa tài khoản'
+  CIB.config.strings.webPageContextPrefix = 'In Jailbreak mode, use carefully to avoid account lockout'
   }
   }
 
@@ -220,7 +220,7 @@ const initChatPrompt = () => {
   const actionBarEle = document.querySelector('#b_sydConvCont > cib-serp')?.shadowRoot?.querySelector('#cib-action-bar-main') as IActionBarElement;
   const oldHandleInputTextKey = actionBarEle.handleInputTextKey;
   actionBarEle.handleInputTextKey = function (ev: KeyboardEvent) {
-    // 有提示词时，优先选择提示词
+    // When there is a prompt, select the prompt first
     if (ev.key === 'Enter' && isShowChatPrompt.value) {
       return;
     }
@@ -266,10 +266,10 @@ const handleInputTextChanged = (ev: Event) => {
 };
 
 const handleInputFocus = (ev: FocusEvent) => {
-  // console.log('获取焦点:', ev);
+  // console.log('Getting focus:', ev);
 };
 const handleInputBlur = (ev: FocusEvent) => {
-  // 简单解决失焦与点击冲突
+  // Simple solution to focus loss and click conflict
   setTimeout(() => {
     isShowChatPrompt.value = false;
   }, 200);
@@ -327,7 +327,7 @@ const handlePromptListScroll = () => {
   setTimeout(() => {
     if (isPromptScrolling.value === true) {
       isPromptScrolling.value = false;
-      // Kết thúc cuộn, đặt lựa chọn
+      // End scrolling, set selection
       const offset = scrollbarRef.value?.getOffset() || 0;
       selectedPromptIndex.value = Math.round(offset / promptItemHeight);
     }
@@ -336,18 +336,18 @@ const handlePromptListScroll = () => {
 
 const auth = async () => {
   if (!authKey.value) {
-    message.error('Vui lòng nhập mã ủy quyền trước');
+    message.error('Please enter your authorization code first');
     return;
   }
   isAuthBtnLoading.value = true;
   userStore.setAuthKey(authKey.value);
   const res = await userStore.getSysConfig();
   if (res.data.isAuth) {
-    message.success('Ủy quyền thành công');
+    message.success('Authorization successful');
     isShowUnauthorizedModal.value = false;
     afterAuth(res.data);
   } else {
-    message.error('Mã ủy quyền không chính xác');
+    message.error('Incorrect authorization code');
   }
   isAuthBtnLoading.value = false;
 };
@@ -375,22 +375,22 @@ const auth = async () => {
         :keeps="10"
         @scroll="handlePromptListScroll"
       />
-      <NEmpty v-else class="bg-white w-full max-w-[1060px] max-h-[390px] rounded-xl py-6" description="Chưa thiết lập dữ liệu từ gợi ý">
+      <NEmpty v-else class="bg-white w-full max-w-[1060px] max-h-[390px] rounded-xl py-6" description="No suggestion data set yet">
         <template #extra>
-          <NButton secondary type="info" @click="isShowPromptSotre = true">Thêm từ gợi ý từ kho</NButton>
+          <NButton secondary type="info" @click="isShowPromptSotre = true">Add suggestions from the store</NButton>
         </template>
       </NEmpty>
     </div>
   </main>
   <footer>
-    <!-- Chọn máy chủ -->
+    <!-- Select server -->
     <ChatServiceSelect />
-    <!-- Ủy quyền -->
+    <!-- Authorization -->
     <div v-if="isShowUnauthorizedModal" class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-black/40 z-50">
-      <NResult class="box-border w-11/12 lg:w-[400px] px-4 py-4 bg-white rounded-md" status="403" title="401 Không được ủy quyền">
+      <NResult class="box-border w-11/12 lg:w-[400px] px-4 py-4 bg-white rounded-md" status="403" title="401 Unauthorized">
         <template #footer>
-          <NInput class="w-11/12" v-model:value="authKey" type="password" placeholder="Vui lòng nhập mã ủy quyền" maxlength="60" clearable></NInput>
-          <n-button class="mt-4" secondary type="info" :loading="isAuthBtnLoading" @click="auth">Ủy quyền</n-button>
+          <NInput class="w-11/12" v-model:value="authKey" type="password" placeholder="Please enter your authorization code" maxlength="60" clearable></NInput>
+          <n-button class="mt-4" secondary type="info" :loading="isAuthBtnLoading" @click="auth">Authorize</n-button>
         </template>
       </NResult>
     </div>

@@ -84,7 +84,7 @@ try {
 }
 _G = {
   Region: 'US',
-  Lang: 'vi-vn',
+  Lang: 'en-US',
   ST: typeof si_ST !== 'undefined' ? si_ST : new Date(),
   Mkt: 'en-US',
   RevIpCC: 'us',
