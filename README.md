@@ -1,6 +1,8 @@
 <h1 align="center">AI Copilot (Bing AI)</h1>
 
 # Original project 
+> Author: [Harry-zklcdc/go-proxy-bingai](https://github.com/Harry-zklcdc/go-proxy-bingai)
+
 > Vietnamese language: https://github.com/chokiproai/AI-Copilot
 
 ## 🤗 Hugging Face
