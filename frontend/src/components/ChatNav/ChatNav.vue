@@ -393,10 +393,13 @@ const autoPassCFChallenge = async () => {
         <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
       </NFormItem>
       <NFormItem path="token" label="Open Source Address">
-        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot-EN" target="_blank" type="success">chokiproai/AI-Copilot</NButton>
+        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot" target="_blank" type="success">chokiproai/AI-Copilot</NButton>
       </NFormItem>
-      <NFormItem path="token" label="Author">
-        <NButton text tag="a" href="https://github.com/chokiproai" target="_blank" type="success">chokiproai</NButton>
+      <NFormItem path="token" label="Original Author">
+        <NButton text tag="a" href="https://github.com/adams549659584/go-proxy-bingai" target="_blank" type="success">adams549659584/go-proxy-bingai</NButton>
+      </NFormItem>
+      <NFormItem path="token" label="Origin Token">
+        <NButton text tag="a" href="https://github.com/Harry-zklcdc/go-proxy-bingai" target="_blank" type="success">Harry-zklcdc/go-proxy-bingai< /NButton>
       </NFormItem>
   </NForm>
 <template #action>
