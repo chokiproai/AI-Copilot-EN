@@ -6,7 +6,7 @@
 > English language: [AI-Copilot-EN](https://github.com/chokiproai/AI-Copilot-EN)
 
 ## 🤗 Hugging Face
-> ## [![Deploy on Hugging Face](https://huggingface.co/datasets/huggingface/badges/raw/main/deploy-on-spaces-md.svg)](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fgpt4%3Fduplicate%3Dtrue)
+> ## [![Deploy on Hugging Face](https://huggingface.co/datasets/huggingface/badges/raw/main/deploy-on-spaces-md.svg)](https://huggingface.co/login?next=%2Fspaces%2Fngoctuanai%2Fcopiloten%3Fduplicate%3Dtrue)
 
 ## Introduction
 - ⭐ Based on Microsoft New Bing, the Microsoft New Bing website is simply customized with Vue3 and Go. It has a consistent user interface experience, supports ChatGPT prompts, is available, and basically compatible with all functions of Microsoft Bing AI. You can chat without logging in.
