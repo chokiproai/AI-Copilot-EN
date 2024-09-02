@@ -22,4 +22,14 @@
   .b_wlcmTile h1 {
     margin: 5px; 
   }
+
+  .b_wlcmCont {
+    display: initial;
+  }
+}
+
+@media(max-width:1024px) {
+	.b_wlcmCont {
+    display: initial;
+  }
 }

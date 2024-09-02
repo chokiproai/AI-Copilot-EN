@@ -32,17 +32,17 @@ const close = async () => {
 const update = async () => {
   isUpdateLoading.value = true;
   await updateServiceWorker();
-  message.success('已切换新版');
+  message.success('New version updated successfully');
   isUpdateLoading.value = false;
   isShowModal.value = false;
 };
 </script>
 
 <template>
-  <NModal v-model:show="isShowModal" preset="dialog" title="更新提示" content="新版本已经更新完毕，是否切换？">
+  <NModal v-model:show="isShowModal" preset="dialog" title="Update Prompt" content="New version has been updated, switch now?">
     <template #action>
-      <NButton size="large" @click="close">下次再说</NButton>
-      <NButton ghost size="large" type="info" @click="update" :loading="isUpdateLoading">立即切换</NButton>
+      <NButton size="large" @click="close">Later</NButton>
+      <NButton ghost size="large" type="info" @click="update" :loading="isUpdateLoading">Switch Now</NButton>
     </template>
   </NModal>
 </template>

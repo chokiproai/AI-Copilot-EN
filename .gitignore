@@ -12,3 +12,6 @@
 .DS_Store
 
 release
+node_modules
+/_worker.js
+/worker.js

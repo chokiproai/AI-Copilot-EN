@@ -53,7 +53,7 @@ export const usePromptStore = defineStore(
       type?: 'add' | 'edit';
       title?: 'Add suggestion' | 'Edit suggestion';
       tmpPrompt?: IPrompt;
-      newPrompt: IPrompt;    
+      newPrompt: IPrompt;
     }>({
       isShow: false,
       newPrompt: {
@@ -61,14 +61,14 @@ export const usePromptStore = defineStore(
         prompt: '',
       },
     });
-    
+
     const searchPromptList = computed(() => {
       if (!keyword.value) {
         return promptList.value;
       }
       return promptList.value?.filter((x) => x.act.includes(keyword.value) || x.prompt.includes(keyword.value));
     });
-    
+
     function addPrompt(list: Array<IPrompt>): IOptPromptResult<{ successCount: number }> {
       if (list instanceof Array<IPrompt> && list.every((x) => x.act && x.prompt)) {
         if (promptList.value.length === 0) {
@@ -92,9 +92,9 @@ export const usePromptStore = defineStore(
         return {
           result: false,
           msg: 'Suggestion format error',
-        };        
+        };
       }
-    }    
+    }
 
     return { promptDownloadConfig, isShowPromptSotre, isShowChatPrompt, promptList, keyword, searchPromptList, selectedPromptIndex, optPromptConfig, addPrompt };
   },

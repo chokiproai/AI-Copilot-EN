@@ -6,10 +6,10 @@ import (
 	"net/http"
 )
 
-func Edgesvc(w http.ResponseWriter, r *http.Request) {
+func Sydney(w http.ResponseWriter, r *http.Request) {
 	if !helper.CheckAuth(r) {
 		helper.UnauthorizedResult(w)
 		return
 	}
-	common.NewSingleHostReverseProxy(common.EDGE_SVC_URL).ServeHTTP(w, r)
+	common.NewSingleHostReverseProxy(common.BING_SYDNEY_URL).ServeHTTP(w, r)
 }

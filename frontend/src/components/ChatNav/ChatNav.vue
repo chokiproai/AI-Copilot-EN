@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { h, ref, onMounted } from 'vue';
-import { NDropdown, type DropdownOption, NModal, NInput, NInputNumber, NButton, useMessage, NImage, NForm, NFormItem, NSwitch, NTag, NSelect, NConfigProvider, lightTheme, darkTheme } from 'naive-ui';
+import { h, ref, onMounted, inject, defineComponent, render } from 'vue';
+import { NDropdown, type DropdownOption, NModal, NInput, NInputNumber, NButton, NGrid, NGridItem, useMessage, NImage, NForm, NFormItem, NSwitch, NTag, NSelect, NSpin, NP, NA, NConfigProvider, NSpace, NRadio, NRadioGroup, NTooltip, NIcon, lightTheme, darkTheme, useOsTheme, type GlobalTheme } from 'naive-ui';
+import conversationCssText from '@/assets/css/conversation.css?raw';
 import settingSvgUrl from '@/assets/img/setting.svg?url';
 import { usePromptStore } from '@/stores/modules/prompt';
 import { storeToRefs } from 'pinia';
@@ -15,10 +16,13 @@ const isShowMore = ref(false);
 const isShowSettingModal = ref(false);
 const isShowAdvancedSettingModal = ref(false);
 const isShowSetAboutModal = ref(false);
+const isShowCookieModal = ref(false);
+const isShowLoginModal = ref(false);
+const isShowIframe = ref(false);
 const userToken = ref('');
 const userKievRPSSecAuth = ref('');
-const userRwBf = ref('');
 const userMUID = ref('');
+const userRwBf = ref('');
 const message = useMessage();
 const promptStore = usePromptStore();
 const { isShowPromptSotre } = storeToRefs(promptStore);
@@ -28,23 +32,67 @@ const chatStore = useChatStore();
 const { isShowChatServiceSelectModal } = storeToRefs(chatStore);
 const userStore = useUserStore();
 const localVersion = __APP_INFO__.version;
-const lastVersion = ref('...');
-const { historyEnable, themeMode, fullCookiesEnable, cookiesStr, enterpriseEnable, customChatNum, gpt4tEnable, sydneyEnable, sydneyPrompt, passServer } = storeToRefs(userStore)
+const lastVersion = ref('Loading...');
+const { historyEnable, themeMode, uiVersion, langRegion, autoReopenMic, fullCookiesEnable, cookiesStr, enterpriseEnable, copilotProEnable, customChatNum, gpt4tEnable, sydneyEnable, sydneyPrompt, passServer } = storeToRefs(userStore);
+
 let cookiesEnable = ref(false);
 let cookies = ref('');
 let history = ref(true);
 let themeModeSetting = ref('auto');
-let theme = ref(lightTheme);
+let uiVersionSetting = ref('v3');
+let langRegionSetting = ref('CN');
+let theme = ref(inject('theme'));
+let autoReopenMicSetting = ref(true);
+
 let settingIconStyle = ref({
   filter: 'invert(70%)',
 })
 let passingCFChallenge = ref(false);
 const enterpriseSetting = ref(false);
+const copilotProSetting = ref(false);
 const customChatNumSetting = ref(0);
 const gpt4tSetting = ref(true);
 const sydneySetting = ref(false);
 const sydneyPromptSetting = ref('');
 const passServerSetting = ref('');
+const getCookieTip = ref('Getting Cookie, please wait...');
+const bingUrl = base58Decode('7RYHpA38gs3NAby2mkvoRMwjncBpS');
+
+const oneKeyLogin = ref('false');
+const loginTypeOptions = ref([
+  {
+    label: 'Account Login',
+    value: 'false',
+  },
+  {
+    label: 'One-click Login',
+    value: 'true',
+  }
+]);
+const msLoginAccount = ref('');
+const msLoginPassword = ref('');
+const msLoginType = ref('passwd');
+const msLoginCode = ref('');
+const msLogining = ref(false);
+const msContinueing = ref(false);
+const msLoginTypeOptions = ref([
+{
+    label: 'Password Login',
+    value: 'passwd',
+},
+{
+    label: 'Email Verification Code Login',
+    value: 'email',
+},
+{
+    label: '2-Factor Authentication Login',
+    value: 'device',
+}
+])
+const msLoginContext = ref({
+  cookies: '',
+  context: {}
+});
 
 const GetLastVersion = async () => {
   const res = await fetch('https://api.github.com/repos/chokiproai/AI-Copilot-EN/releases/latest');
@@ -53,113 +101,162 @@ const GetLastVersion = async () => {
 };
 
 const navType = {
-  github: 'github',
-  chatService: 'chatService',
-  promptStore: 'promptStore',
+  login: 'login',
   setting: 'setting',
+  chat: 'chat',
+  notebook: 'notebook',
   compose: 'compose',
   createImage: 'createImage',
-  advancedSetting: 'advancedSetting',
   reset: 'reset',
   about: 'about',
 };
-const navConfigs = [
+let navConfigs = ref([
   {
-    key: navType.promptStore,
-    label: 'Suggestion Store',
-},
-{
-    key: navType.advancedSetting,
-    label: 'Advanced Settings',
-},
-{
+    key: navType.setting,
+    label: 'Settings',
+  },
+  {
+    key: navType.notebook,
+    label: 'Notebook',
+  },
+  {
     key: navType.reset,
-    label: 'Reset All',
-},
-{
+    label: 'One-click Reset',
+  },
+  {
     key: navType.about,
     label: 'About'
-},
-];
+  },
+]);
 
 const themeModeOptions = ref([
-{
-    label: 'Light Color',
+  {
+    label: 'Light',
     value: 'light',
-}, {
-    label: 'Dark Color',
+  }, {
+    label: 'Dark',
     value: 'dark',
-}, {
-    label: 'Follow System',
+  }, {
+    label: 'Auto',
     value: 'auto',
-}
+  }
+]);
+
+const uiVersionOptions = ref([
+  {
+    label: 'V1',
+    value: 'v1',
+  },
+  {
+    label: 'V2',
+    value: 'v2',
+  },
+  {
+    label: 'V3',
+    value: 'v3',
+  }
+]);
+
+const langRegionOptions = ref([
+  {
+    label: 'English',
+    value: 'US',
+  }
 ]);
 
 onMounted(() => {
   if (themeMode.value == 'light') {
-    theme.value = lightTheme;
     settingIconStyle.value = { filter: 'invert(0%)' }
   } else if (themeMode.value == 'dark') {
-    theme.value = darkTheme;
     settingIconStyle.value = { filter: 'invert(70%)' }
   } else if (themeMode.value == 'auto') {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      theme.value = darkTheme;
+    if (useOsTheme().value == 'dark') {
       settingIconStyle.value = { filter: 'invert(70%)' }
     } else {
-      theme.value = lightTheme;
       settingIconStyle.value = { filter: 'invert(0%)' }
     }
   }
 })
 
+const sleep = async (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const renderDropdownLabel = (option: DropdownOption) => {
   return h(ChatNavItem as Component, { navConfig: option });
 };
 
-const handleSelect = (key: string) => {
+const handleSelect = async (key: string) => {
   switch (key) {
-    case navType.chatService:
+    case navType.chat:
       {
-        isShowChatServiceSelectModal.value = true;
-        chatStore.checkAllSydneyConfig();
+        CIB.showConversation();
+        navConfigs.value[1] = {
+          key: navType.notebook,
+          label: 'Notebook',
+        };
+        const prjupyIndex = CIB.config.sydney.request.optionsSets.indexOf('prjupy');
+        const galileoIndex = CIB.config.sydney.request.optionsSets.indexOf('clgalileo');
+        CIB.config.sydney.request.optionsSets = CIB.config.sydney.request.optionsSets.slice(0, prjupyIndex);
+        if (galileoIndex > -1) {
+          CIB.config.sydney.request.optionsSets[galileoIndex] = 'galileo';
+        }
+        if (uiVersion.value == 'v3') {
+          await sleep(25);
+          await ChatHomeScreen.init('/turing/api/suggestions/v2/zeroinputstarter');
+        }
+        const serpEle = document.querySelector('cib-serp');
+        const conversationEle = serpEle?.shadowRoot?.querySelector('cib-conversation') as HTMLElement;
+        // todo 反馈暂时无法使用，先移除
+        const welcomeEle = conversationEle?.shadowRoot?.querySelector('cib-welcome-container');
+        const loginTip = welcomeEle?.shadowRoot?.querySelectorAll("div[class='muid-upsell']");
+        if (loginTip?.length) {
+          loginTip.forEach((ele) => {
+            ele.remove();
+          });
+        }
+        welcomeEle?.shadowRoot?.querySelector('.preview-container')?.remove();
+        welcomeEle?.shadowRoot?.querySelector('.footer')?.remove();
+        serpEle?.shadowRoot?.querySelector('cib-serp-feedback')?.remove();
+        if (isMobile()) {
+          welcomeEle?.shadowRoot?.querySelector('.container-item')?.remove();
+          CIB.vm.actionBar.input.placeholder = 'Have a question? Ask me... ( "/" triggers suggestions)';
+        }
+        // 加入css
+        const conversationStyleEle = document.createElement('style');
+        conversationStyleEle.innerText = conversationCssText;
+        conversationEle.shadowRoot?.append(conversationStyleEle);
       }
       break;
-    case navType.promptStore:
+    case navType.notebook:
       {
-        isShowPromptSotre.value = true;
+        CIB.showNotebook();
+        const galileoIndex = CIB.config.sydney.request.optionsSets.indexOf('galileo');
+        if (galileoIndex > -1) {
+          CIB.config.sydney.request.optionsSets[galileoIndex] = 'clgalileo';
+        }
+        CIB.config.sydney.request.optionsSets.push('prjupy', 'uprofdeuv1', 'uprofupdv2', 'gndlogcf');
+        navConfigs.value[1] = {
+          key: navType.chat,
+          label: 'Chat',
+        };
+        await sleep(25);
+        const serpEle = document.querySelector('cib-serp');
+        const notebook = serpEle?.shadowRoot?.querySelector('cib-notebook');
+        const disclaimer = notebook?.shadowRoot?.querySelector('cib-ai-disclaimer');
+        disclaimer?.shadowRoot?.querySelector('div')?.remove();
+        disclaimer?.shadowRoot?.querySelector('div')?.remove();
       }
       break;
     case navType.setting:
       {
-        userToken.value = userStore.getUserToken();
-        userKievRPSSecAuth.value = userStore.getUserKievRPSSecAuth();
-        userRwBf.value = userStore.getUserRwBf();
-        userMUID.value = userStore.getUserMUID();
-        history.value = historyEnable.value;
-        cookiesEnable.value = fullCookiesEnable.value;
-        if (cookiesEnable.value) { cookies.value = cookiesStr.value; }
-        themeModeSetting.value = themeMode.value;
         isShowSettingModal.value = true;
-      }
-      break;
-    case navType.advancedSetting:
-      {
-        history.value = historyEnable.value;
-        themeModeSetting.value = themeMode.value;
-        enterpriseSetting.value = enterpriseEnable.value;
-        customChatNumSetting.value = customChatNum.value;
-        gpt4tSetting.value = gpt4tEnable.value;
-        sydneySetting.value = sydneyEnable.value;
-        sydneyPromptSetting.value = sydneyPrompt.value;
-        isShowAdvancedSettingModal.value = true;
-        passServerSetting.value = passServer.value;
       }
       break;
     case navType.createImage:
       {
         if (!userStore.sysConfig?.isSysCK && !userStore.getUserToken()) {
-          message.warning('Need to log in first to experience the drawing function');
+          message.warning('Please log in to experience the drawing feature');
         }
         isShowCreateImageModal.value = true;
       }
@@ -173,12 +270,79 @@ const handleSelect = (key: string) => {
       {
         isShowSetAboutModal.value = true;
         GetLastVersion();
+        await sleep(25)
+        const ele = document.createElement('div');
+        render(h(NConfigProvider, { theme: theme.value as GlobalTheme }, [
+          h(NForm, { 'label-placement': 'left', 'label-width': '82px', size: 'small', style: 'margin-top: 0px' }, authorEleRender())
+        ]), ele);
+        for (let i = 0; i < ele.childNodes.length; i++) {
+          document.getElementById('latestVersion')?.parentNode?.appendChild(ele.childNodes[i]);
+        }
       }
       break;
     default:
       break;
   }
 };
+
+const settingMenu = (key: string) => {
+  switch(key) {
+    case 'autoPassCFChallenge':
+      {
+      autoPassCFChallenge()
+      }
+      break;
+    case 'login':
+      {
+        isShowLoginModal.value = true;
+        isShowIframe.value = false;
+      }
+      break;
+    case 'chatService':
+      {
+        isShowChatServiceSelectModal.value = true;
+        chatStore.checkAllSydneyConfig();
+      }
+      break;
+    case 'cookieSetting':
+      {
+        userToken.value = userStore.getUserToken();
+        userKievRPSSecAuth.value = userStore.getUserKievRPSSecAuth();
+        userMUID.value = userStore.getUserMUID();
+        userRwBf.value = userStore.getUserRwBf();
+        history.value = historyEnable.value;
+        cookiesEnable.value = fullCookiesEnable.value;
+        cookies.value = cookiesStr.value;
+        isShowCookieModal.value = true;
+      }
+      break;
+    case 'promptStore':
+      {
+        isShowPromptSotre.value = true;
+      }
+      break;
+    case 'advancedSetting':
+      {
+        history.value = historyEnable.value;
+        themeModeSetting.value = themeMode.value;
+        uiVersionSetting.value = uiVersion.value;
+        langRegionSetting.value = langRegion.value;
+        copilotProSetting.value = copilotProEnable.value;
+        enterpriseSetting.value = enterpriseEnable.value;
+        customChatNumSetting.value = customChatNum.value;
+        gpt4tSetting.value = gpt4tEnable.value;
+        autoReopenMicSetting.value = autoReopenMic.value;
+        sydneySetting.value = sydneyEnable.value;
+        sydneyPromptSetting.value = sydneyPrompt.value;
+        passServerSetting.value = passServer.value;
+        isShowAdvancedSettingModal.value = true;
+      }
+      break;
+    default:
+      return;
+  }
+}
+
 const resetCache = async () => {
   isShowClearCacheModal.value = false;
   await userStore.resetCache();
@@ -191,29 +355,28 @@ const saveSetting = () => {
     userStore.saveCookies(cookies.value);
     cookiesStr.value = cookies.value;
   } else {
-    if (!userToken.value) {
-      message.warning('Please fill in the user _U Cookie first');
-    } else {
-      userStore.saveUserToken(userToken.value);
-    }
-    if (!userKievRPSSecAuth.value) {
-      message.warning('Please fill in the user KievRPSSecAuth Cookie first');
-    } else {
-      userStore.saveUserKievRPSSecAuth(userKievRPSSecAuth.value);
-    }
-    if (!userRwBf.value) {
-      message.warning('Please fill in the user _RwBf Cookie first');
-    } else {
-      userStore.saveUserRwBf(userRwBf.value);
-    }
-    if (!userMUID.value) {
-      message.warning('Please fill in the user MUID Cookie first');
-    } else {
-      userStore.saveUserMUID(userMUID.value);
-    }
+  if (!userToken.value) {
+    message.warning('Please enter the user _U Cookie first');
+  } else {
+    userStore.saveUserToken(userToken.value);
+  }
+  if (!userKievRPSSecAuth.value) {
+    message.warning('Please enter the user KievRPSSecAuth Cookie first');
+  } else {
+    userStore.saveUserKievRPSSecAuth(userKievRPSSecAuth.value);
+  }
+  if (!userRwBf.value) {
+    message.warning('Please enter the user _RwBf Cookie first');
+  } else {
+    userStore.saveUserRwBf(userRwBf.value);
+  }
+  if (!userMUID.value) {
+    message.warning('Please enter the user MUID Cookie first');
+  } else {
+    userStore.saveUserMUID(userMUID.value);
   }
   fullCookiesEnable.value = cookiesEnable.value;
-  isShowSettingModal.value = false;
+  isShowCookieModal.value = false;
 };
 
 const saveAdvancedSetting = () => {
@@ -221,22 +384,47 @@ const saveAdvancedSetting = () => {
   const tmpEnterpris = enterpriseEnable.value;
   enterpriseEnable.value = enterpriseSetting.value;
   customChatNum.value = customChatNumSetting.value;
-  const tmpGpt4t = gpt4tEnable.value, tmpSydney = sydneyEnable.value;
+  const tmpGpt4t = gpt4tEnable.value, tmpSydney = sydneyEnable.value, tmpuiVersion = uiVersion.value, tmpCopilotPro = copilotProEnable.value;
+  copilotProEnable.value = copilotProSetting.value;
   gpt4tEnable.value = gpt4tSetting.value;
+  autoReopenMic.value = autoReopenMicSetting.value;
   sydneyEnable.value = sydneySetting.value;
   sydneyPrompt.value = sydneyPromptSetting.value;
-  userStore.setPassServer(passServerSetting.value)
+  uiVersion.value = uiVersionSetting.value;
+  if (passServerSetting.value && passServerSetting.value.startsWith('http')) {
+    userStore.setPassServer(passServerSetting.value)
+  }
+  if (langRegion.value != langRegionSetting.value) {
+    langRegion.value = langRegionSetting.value;
+    _G.Region = langRegionSetting.value;
+  }
 
   const serpEle = document.querySelector('cib-serp');
   const sidepanel = serpEle?.shadowRoot?.querySelector('cib-conversation')?.querySelector('cib-side-panel')?.shadowRoot?.querySelector('.main')
   const threadsHeader = sidepanel?.querySelector('.threads-header') as HTMLElement;
   const threadsContainer = sidepanel?.querySelector('.threads-container') as HTMLElement;
-  if (history.value && userStore.getUserToken() && !enterpriseEnable.value) {
-    threadsHeader.style.display = 'flex'
-    threadsContainer.style.display = 'block'
-  } else {
-    threadsHeader.style.display = 'none'
-    threadsContainer.style.display = 'none'
+  if (!isMobile()) {
+    if (history.value && userStore.getUserToken() && !enterpriseEnable.value) {
+      if (tmpuiVersion === 'v1') {
+        CIB.vm.sidePanel.panels = [
+          { type: 'threads', label: 'Recent activities' },
+          { type: 'plugins', label: 'Plugins' }
+        ]
+      } else {
+        threadsHeader.style.display = 'flex'
+        threadsContainer.style.display = 'block'
+      }
+    } else {
+      if (tmpuiVersion === 'v2') {
+        threadsHeader.style.display = 'none'
+        threadsContainer.style.display = 'none'
+      } else {
+        CIB.vm.sidePanel.panels = [
+          { type: 'plugins', label: 'Plugins' }
+        ]
+        CIB.vm.sidePanel.selectedPanel = 'plugins'
+      }
+    }
   }
 
   themeMode.value = themeModeSetting.value;
@@ -249,7 +437,7 @@ const saveAdvancedSetting = () => {
     theme.value = darkTheme;
     settingIconStyle.value = { filter: 'invert(70%)' }
   } else if (themeModeSetting.value == 'auto') {
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    if (useOsTheme().value == 'dark') {
       CIB.changeColorScheme(1);
       theme.value = darkTheme;
       settingIconStyle.value = { filter: 'invert(70%)' }
@@ -260,152 +448,519 @@ const saveAdvancedSetting = () => {
     }
   }
   isShowAdvancedSettingModal.value = false;
-  if (tmpEnterpris != enterpriseSetting.value || tmpSydney != sydneySetting.value || tmpGpt4t != gpt4tSetting.value) {
+  if (tmpEnterpris != enterpriseSetting.value || tmpSydney != sydneySetting.value || tmpGpt4t != gpt4tSetting.value || tmpuiVersion != uiVersionSetting.value || tmpCopilotPro != copilotProSetting.value) {
     window.location.href = '/';
   }
 }
 
+const newWindow = () => {
+  window.open("/fd/auth/signin?action=interactive&provider=windows_live_id&return_url=https%3a%2f%2fwww.bing.com%2fchat%3fq%3dBing%2bAI%26FORM%3dhpcodx%26wlsso%3d1%26wlexpsignin%3d1&src=EXPLICIT&sig=001DD71D5A386F753B1FC3055B306E8F", "_blank");
+}
+
+const loginHandel = async ()=> {
+  isShowIframe.value = true;
+  getCookieTip.value = 'Getting Cookie, please wait...';
+  window.addEventListener('message', function (e) {
+    const d = e.data
+    if (d.cookies != "" && d.cookies != null && d.cookies != undefined) {
+      userStore.saveCookies(d.cookies);
+      cookiesStr.value = d.cookies;
+      message.success('Login successful');
+      isShowLoginModal.value = false;
+      window.location.href = '/';
+    }
+  })
+}
+  await sleep(1500);
+  getCookieTimeoutHandel();
+  const iframe = document.getElementById('login');
+  const S = base58Decode(_G.S);
+  let tmpA = [];
+  for (let i = 0; i < _G.SP.length; i++) {
+    tmpA.push(S[_G.SP[i]]);
+  }
+  const e = base58Decode(tmpA.join(''));
+  (iframe as any).contentWindow.postMessage({
+    IG: _G.IG,
+    T: await aesEncrypt(e, _G.IG),
+  }, '*');
+}
+
+const msLoginHandel = async () => {
+  msLogining.value = true;
+  switch (msLoginType.value) {
+    case 'passwd':
+      {
+        if (!msLoginAccount.value) {
+          message.warning('Please enter your account first');
+          msLogining.value = false;
+          break;
+        } else if (!msLoginPassword.value) {
+          message.warning('Please enter your password first');
+          msLogining.value = false;
+          break;
+        }
+        const res = await fetch('/api/ms/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account: msLoginAccount.value,
+            password: msLoginPassword.value,
+            type: msLoginType.value,
+          })
+        })
+        if (!res.ok) {
+          message.error('Login failed, please try again');
+          msLogining.value = false;
+          break;
+        }
+        message.success('Login successful');
+        isShowLoginModal.value = false;
+        const resData = await res.json();
+        userStore.saveCookies(resData.data.cookies);
+        cookiesStr.value = resData.data.cookies;
+        fullCookiesEnable.value = true;
+        window.location.href = '/';
+      }
+      break;
+    case 'email':
+      {
+        if (!msLoginAccount.value) {
+          message.warning('Please enter your account first');
+          msLogining.value = false;
+          break;
+        }
+        const res = await fetch('/api/ms/login', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account: msLoginAccount.value,
+            type: msLoginType.value,
+            verify_code: msLoginCode.value,
+            cookies: msLoginContext.value.cookies,
+            context: msLoginContext.value.context,
+          }),
+        })
+        if (!res.ok) {
+          message.error('Login failed, please try again');
+          msLogining.value = false;
+          break;
+        }
+        message.success('Login successful');
+        isShowLoginModal.value = false;
+        const resData = await res.json();
+        userStore.saveCookies(resData.data.cookies);
+        cookiesStr.value = resData.data.cookies;
+        fullCookiesEnable.value = true;
+        window.location.href = '/';
+      }
+      break;
+    case 'device':
+      {
+        if (!msLoginAccount.value) {
+          message.warning('Please enter your account first');
+          msLogining.value = true;
+          break;
+        }
+        const res = await fetch('/api/ms/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account: msLoginAccount.value,
+            type: msLoginType.value,
+          })
+        })
+        const resData = await res.json();
+        if (res.status != 201) {
+          message.error('Failed to obtain 2FA, please try again');
+          msLogining.value = false;
+          break;
+        }
+        message.success('2FA obtained successfully, please view and enter the verification code on your phone');
+        msLoginCode.value = resData.data.code;
+        msLoginContext.value.cookies = resData.data.cookies;
+        msLoginContext.value.context = resData.data.context;
+        await msLoginContinueHandel();
+      }
+      break;
+    default:
+      msLogining.value = false;
+      break;
+  }
+}
+
+const msLoginContinueHandel = async () => {
+  msContinueing.value = true;
+  switch (msLoginType.value) {
+    case 'email':
+      {
+        if (!msLoginAccount.value) {
+          message.warning('Please enter your account first');
+          msLogining.value = true;
+          break;
+        }
+        const res = await fetch('/api/ms/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account: msLoginAccount.value,
+            type: msLoginType.value,
+          })
+        })
+        if (res.status != 201) {
+          message.error('Failed to obtain email verification code, please try again');
+          msContinueing.value = false;
+          break;
+        }
+        message.success('Email verification code obtained successfully, please check your email');
+        msContinueing.value = false;
+        const resData = await res.json();
+        msLoginContext.value.cookies = resData.data.cookies;
+        msLoginContext.value.context = resData.data.context;
+      }
+      break;
+    case 'device':
+      {
+        if (!msLoginAccount.value) {
+          message.warning('Please enter your account first');
+          msLogining.value = true;
+          break;
+        }
+        const res = await fetch('/api/ms/login', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account: msLoginAccount.value,
+            type: msLoginType.value,
+            cookies: msLoginContext.value.cookies,
+            context: msLoginContext.value.context,
+          }),
+        })
+        if (!res.ok) {
+          message.error('Failed to obtain 2FA, please try again');
+          msLogining.value = false;
+          break;
+        }
+        message.success('Login successful');
+        isShowLoginModal.value = false;
+        const resData = await res.json();
+        userStore.saveCookies(resData.data.cookies);
+        cookiesStr.value = resData.data.cookies;
+        fullCookiesEnable.value = true;
+        window.location.href = '/';
+      }
+      break;
+    default:
+      msContinueing.value = false;
+      break;
+  }
+}
+
+const authorEleRender = () => {
+  const data = JSON.parse(decodeURI(base58Decode(_G.TP)));
+  let r = []
+  for (let i = 0; i < data.length; i++) {
+    r.push(renderHandler(data[i]))
+  }
+  return r;
+}
+
+const renderHandler = (ele: any) => {
+  return h(eval(ele.type), ele.props, ele.children.map((child: any) => {
+    if (child.type) {
+      return renderHandler(child);
+    } else {
+      return child;
+    }
+  }));
+}
+
+const getCookieTimeoutHandel = async() => {
+  await sleep(3000)
+  getCookieTip.value = 'Cookie retrieval took too long, please check if the Tampermonkey plugin and script are installed correctly';
+}
+
 const autoPassCFChallenge = async () => {
-  passingCFChallenge.value = true;
   let resq = await fetch('/pass', {
     credentials: 'include',
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
-    mode: "cors", // no-cors, *cors, same-origin
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      "url": passServer.value,
+      'IG': _G.IG,
+      'T': await aesEncrypt(_G.AT, _G.IG),
     }),
   }).then((res) => res.json())
   .catch(() => {
-    message.error('Robot verification failed, please try again');
+    message.error('Human verification failed, please try again');
     passingCFChallenge.value = false;
   })
   if (resq['result'] != null && resq['result'] != undefined) {
     userStore.saveCookies(resq['result']['cookies']);
     cookiesStr.value = resq['result']['cookies'];
-    message.success('Automatically bypass robot verification successful');
+    message.success('Automatically passed human verification successfully');
     passingCFChallenge.value = false;
     window.location.href = '/';
   } else {
-    message.error('Robot verification failed, please try again');
+    message.error('Human verification failed, please try again');
     passingCFChallenge.value = false;
   }
 }
 </script>
 
-
 <template>
-  <NConfigProvider :theme="theme">
-    <NDropdown v-if="isMobile()" class="select-none" :show="isShowMore" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="Setting menu" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
-    </NDropdown>
-    <NDropdown v-else class="select-none" trigger="hover" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
-      <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="Setting menu" :preview-disabled="true" :style="settingIconStyle"></NImage>
-    </NDropdown>
-    <NModal v-model:show="isShowSettingModal" preset="dialog" :show-icon="false">
-      <template #header>
-        <div class="text-3xl py-2">Settings</div>
-      </template>
+  <NDropdown v-if="isMobile()" class="select-none" :show="isShowMore" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
+    <NImage class="fixed top-6 right-4 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings menu" :preview-disabled="true" @click="isShowMore = !isShowMore" :style="settingIconStyle"></NImage>
+  </NDropdown>
+  <NDropdown v-else class="select-none" trigger="hover" :options="navConfigs" :render-label="renderDropdownLabel" @select="handleSelect">
+    <NImage class="fixed top-6 right-6 cursor-pointer z-50" :src="settingSvgUrl" alt="Settings menu" :preview-disabled="true" :style="settingIconStyle"></NImage>
+  </NDropdown>
+  <NModal v-model:show="isShowLoginModal" preset="dialog" :show-icon="false">
+    <template #header>
+      <div class="text-3xl py-2">Account login</div>
+    </template>
+    <NSelect v-model:value="oneKeyLogin" :options="loginTypeOptions" size="large" placeholder="Select login method" />
+    <div v-if="oneKeyLogin == 'true'">
+      <div v-if="!isShowIframe" style="margin-top:12px; margin-bottom:24px">
+        <NP>
+          Before using this feature, please install the <NA href="https://www.tampermonkey.net/">Tampermonkey plugin</NA> and <NA href="https://greasyfork.org/zh-CN/scripts/487409-go-proxy-bingai">this script</NA>
+          <br>
+          Please click the "Open login page" button below, log in to your account on the newly opened login page, and click OK after successful login
+        </NP>
+      </div>
+      <div v-else>
+        <NSpin size="large" :description="getCookieTip" style="margin: 0 auto; width: 100%" />
+        <iframe id="login" :src="bingUrl" style="border: none; width: 0; height: 0" />
+      </div>
+    </div>
+    <div v-else>
       <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging" style="margin-top: 16px;">
-        <NFormItem path="cookiesEnable" label="Automatic robot verification">
-          <NButton type="info" :loading="passingCFChallenge" @click="autoPassCFChallenge">Start</NButton>
+        <NFormItem path="cookiesEnable" label="Login method">
+          <NRadioGroup v-model:value="msLoginType">
+            <NSpace vertical>
+              <NRadio v-for="item in msLoginTypeOptions" size="large" :key="item.value" :value="item.value">{{ item.label }}</NRadio>
+            </NSpace>
+          </NRadioGroup>
         </NFormItem>
-        <NFormItem path="cookiesEnable" label="Complete Cookie">
-  <NSwitch v-model:value="cookiesEnable" />
-  </NFormItem>
-  <NFormItem v-show="!cookiesEnable" path="token" label="Token">
-    <NInput size="large" v-model:value="userToken" type="text" placeholder="User Cookie, just need the value of _U" />
-  </NFormItem>
-  <NFormItem v-show="!cookiesEnable" path="token" label="KievRPSSecAuth">
-    <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="User Cookie, just need the value of KievRPSSecAuth" />
-  </NFormItem>
-  <NFormItem v-show="!cookiesEnable" path="token" label="_RwBf">
-    <NInput size="large" v-model:value="userRwBf" type="text" placeholder="User Cookie, just need the value of _RwBf" />
-  </NFormItem>
-  <NFormItem v-show="!cookiesEnable" path="token" label="MUID">
-    <NInput size="large" v-model:value="userMUID" type="text" placeholder="User Cookie, just need the value of MUID" />
-  </NFormItem>
-  <NFormItem v-show="cookiesEnable" path="token" label="Cookies">
-    <NInput size="large" v-model:value="cookies" type="text" placeholder="Complete User Cookie" />
-  </NFormItem>
-  </NForm>
-      <template #action>
-  <NButton size="large" @click="isShowSettingModal = false">Cancel</NButton>
-  <NButton ghost size="large" type="info" @click="saveSetting">Save</NButton>
+        <NFormItem path="account" label="Account">
+          <NInput size="large" v-model:value="msLoginAccount" type="text" placeholder="Account" />
+        </NFormItem>
+        <NFormItem v-show="msLoginType === 'passwd'" path="password" label="Password">
+          <NInput size="large" v-model:value="msLoginPassword" type="password" show-password-on="click" placeholder="Password" />
+        </NFormItem>
+        <NFormItem v-show="msLoginType !== 'passwd'" path="verify_code" label="Verification code">
+          <NInput size="large" v-model:value="msLoginCode" type="text" placeholder="Verification code" :disabled="msLoginType === 'device'" />
+        </NFormItem>
+      </NForm>
+    </div>
+<template #action>
+  <NButton v-show="oneKeyLogin == 'true'" size="large" type="info" @click="newWindow">Open login page</NButton>
+  <NButton v-show="oneKeyLogin == 'true'" size="large" @click="isShowLoginModal = false">Cancel</NButton>
+  <NButton v-show="oneKeyLogin == 'true'" ghost size="large" type="info" @click="loginHandel">OK</NButton>
+  <NButton v-show="oneKeyLogin != 'true' && msLoginType === 'email'" size="large" type="info" :loading="msContinueing" @click="msLoginContinueHandel">Get email verification code</NButton>
+  <NButton v-show="oneKeyLogin != 'true'" ghost size="large" type="info" :loading="msLogining" @click="msLoginHandel">OK</NButton>
 </template>
 </NModal>
-<NModal v-model:show="isShowAdvancedSettingModal" preset="dialog" :show-icon="false">
+<NModal v-model:show="isShowSettingModal" preset="dialog" :show-icon="false">
   <template #header>
-    <div class="text-3xl py-2">Advanced Settings</div>
+    <div class="text-3xl py-2">Settings</div>
   </template>
-  <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging"
-    style="margin-top: 16px;">
-    <NFormItem path="history" label="History">
-      <NSwitch v-model:value="history" />
-    </NFormItem>
-    <NFormItem path="enterpriseEnable" label="Enterprise Version">
-      <NSwitch v-model:value="enterpriseSetting" />
-    </NFormItem>
-    <NFormItem path="gpt4tEnable" label="GPT4 Turbo">
-      <NSwitch v-model:value="gpt4tSetting" />
-    </NFormItem>
-    <NFormItem path="sydneyEnable" label="Jailbreak Mode">
-      <NSwitch v-model:value="sydneySetting" />
-    </NFormItem>
-    <NFormItem path="sydneyPrompt" label="Robot Verification Server">
-      <NInput size="large" v-model:value="passServerSetting" type="text" placeholder="Robot Verification Server" />
-    </NFormItem>
-    <NFormItem path="sydneyPrompt" label="Suggestion Word">
-      <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="Jailbreak Mode Suggestion Word" />
-    </NFormItem>
-    <NFormItem path="themeMode" label="Theme Mode">
-      <NSelect v-model:value="themeModeSetting" :options="themeModeOptions" size="large" placeholder="Please select a theme mode" />
-    </NFormItem>
-    <NFormItem v-show="!cookiesEnable" path="customChatNum" label="Number of Chats">
-      <NInputNumber size="large" v-model:value="customChatNumSetting" min="0" style="width: 100%;"/>
-    </NFormItem>
-      </NForm>
-      <template #action>
-  <NButton size="large" @click="isShowAdvancedSettingModal = false">Cancel</NButton>
-  <NButton ghost size="large" type="info" @click="saveAdvancedSetting">Save</NButton>
-  </template>
-  </NModal>
-  <NModal v-model:show="isShowClearCacheModal" preset="dialog" :show-icon="false">
-    <template #header>
-      <div class="text-xl py-2">Are you sure you want to delete all cache including Cookies?</div>
-    </template>
-    <template #action>
-      <NButton size="large" @click="isShowClearCacheModal = false">Cancel</NButton>
-      <NButton ghost size="large" type="error" @click="resetCache">Agree</NButton>
-    </template>
-  </NModal>
-  <NModal v-model:show="isShowSetAboutModal" preset="dialog" :show-icon="false">
-    <template #header>
-      <div class="text-3xl py-2">About</div>
-    </template>
-    <NForm ref="formRef" label-placement="left" label-width="auto" size="small" style="margin-top: 16px;">
-      <NFormItem path="" label="Version">
-        <NTag type="info" size="small" round>{{ 'v' + localVersion }}</NTag>
-      </NFormItem>
-      <NFormItem path="" label="Latest Version">
-        <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
-      </NFormItem>
-      <NFormItem path="token" label="Open Source Address">
-        <NButton text tag="a" href="https://github.com/chokiproai/AI-Copilot-EN" target="_blank" type="success">chokiproai/AI-Copilot-EN</NButton>
-      </NFormItem>
-      <NFormItem path="token" label="Original Author">
-        <NButton text tag="a" href="https://github.com/adams549659584/go-proxy-bingai" target="_blank" type="success">adams549659584/go-proxy-bingai</NButton>
-      </NFormItem>
-      <NFormItem path="token" label="Origin Token">
-        <NButton text tag="a" href="https://github.com/Harry-zklcdc/go-proxy-bingai" target="_blank" type="success">Harry-zklcdc/go-proxy-bingai</NButton>
-      </NFormItem>
+  <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging" style="margin-top: 16px;">
+    <NGrid x-gap="0" :cols="2">
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Auto human verification">
+          <NTooltip>
+            <template #trigger>
+              <NButton type="info" :loading="passingCFChallenge" @click="settingMenu('autoPassCFChallenge')">Start</NButton>
+            </template>
+            Old version of human verification, now fully automatic proxy pass
+          </NTooltip>
+        </NFormItem>
+      </NGridItem>
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Account login">
+          <NButton type="info" @click="settingMenu('login')">Open</NButton>
+        </NFormItem>
+      </NGridItem>
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Service selection">
+          <NButton type="info" @click="settingMenu('chatService')">Open</NButton>
+        </NFormItem>
+      </NGridItem>
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Cookie settings">
+          <NButton type="info" @click="settingMenu('cookieSetting')">Open</NButton>
+        </NFormItem>
+      </NGridItem>
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Prompt library">
+          <NButton type="info" @click="settingMenu('promptStore')">Open</NButton>
+        </NFormItem>
+      </NGridItem>
+      <NGridItem>
+        <NFormItem path="cookiesEnable" label="Advanced settings">
+          <NButton type="info" @click="settingMenu('advancedSetting')">Open</NButton>
+        </NFormItem>
+      </NGridItem>
+    </NGrid>
   </NForm>
-<template #action>
-  <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">Agree</NButton>
+  <template #action>
+    <NButton ghost size="large" type="info" @click="isShowSettingModal = false">OK</NButton>
   </template>
+</NModal>
+</NModal>
+<NModal v-model:show="isShowCookieModal" preset="dialog" :show-icon="false">
+    <template #header>
+      <div class="text-3xl py-2">Cookie settings</div>
+    </template>
+    <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging" style="margin-top: 16px;">
+      <NFormItem path="cookiesEnable" label="Complete Cookie">
+        <NSwitch v-model:value="cookiesEnable" />
+      </NFormItem>
+      <NFormItem v-show="!cookiesEnable" path="token" label="Token">
+        <NInput size="large" v-model:value="userToken" type="text" placeholder="User Cookie, only need _U value" />
+      </NFormItem>
+      <NFormItem v-show="!cookiesEnable" path="token" label="KievRPSSecAuth">
+        <NInput size="large" v-model:value="userKievRPSSecAuth" type="text" placeholder="User Cookie, only need KievRPSSecAuth value" />
+      </NFormItem>
+      <NFormItem v-show="!cookiesEnable" path="token" label="_RwBf">
+        <NInput size="large" v-model:value="userRwBf" type="text" placeholder="User Cookie, only need _RwBf value" />
+      </NFormItem>
+      <NFormItem v-show="!cookiesEnable" path="token" label="MUID">
+        <NInput size="large" v-model:value="userMUID" type="text" placeholder="User Cookie, only need MUID value" />
+      </NFormItem>
+      <NFormItem v-show="cookiesEnable" path="token" label="Cookies">
+        <NInput size="large" v-model:value="cookies" type="text" placeholder="Complete user Cookie" />
+      </NFormItem>
+    </NForm>
+    <template #action>
+      <NButton size="large" @click="isShowCookieModal = false">Cancel</NButton>
+      <NButton ghost size="large" type="info" @click="saveSetting">Save</NButton>
+    </template>
+  </NModal>
+  <NModal v-model:show="isShowAdvancedSettingModal" preset="dialog" :show-icon="false">
+    <template #header>
+      <div class="text-3xl py-2">Advanced settings</div>
+    </template>
+    <NForm ref="formRef" label-placement="left" label-width="auto" require-mark-placement="right-hanging"
+      style="margin-top: 16px;">
+      <NGrid x-gap="0" :cols="2">
+        <NGridItem>
+          <NFormItem path="history" label="History record">
+            <NSwitch v-model:value="history" />
+          </NFormItem>
+        </NGridItem>
+        <NGridItem>
+          <NFormItem path="enterpriseEnable" label="Enterprise edition">
+            <NSwitch v-model:value="enterpriseSetting" />
+          </NFormItem>
+        </NGridItem>
+        <NGridItem>
+          <NFormItem path="copilotProEnable">
+            <template #label>
+              Copilot Pro
+              <NTooltip trigger="hover">
+                <template #trigger>
+                  <NIcon size="14" style="top: 2px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M256 56C145.72 56 56 145.72 56 256s89.72 200 200 200s200-89.72 200-200S366.28 56 256 56zm0 82a26 26 0 1 1-26 26a26 26 0 0 1 26-26zm64 226H200v-32h44v-88h-32v-32h64v120h44z" fill="currentColor"></path></svg>
+                  </NIcon>
+                </template>
+                If you have a Copilot Pro account, you can enable this option
+              </NTooltip>
+            </template>
+            <NSwitch v-model:value="copilotProSetting" />
+          </NFormItem>
+        </NGridItem>
+        <NGridItem>
+          <NFormItem path="sydneyEnable" label="Continuous voice dialogue">
+            <NSwitch v-model:value="autoReopenMicSetting" />
+          </NFormItem>
+        </NGridItem>
+        <NGridItem>
+          <NFormItem path="gpt4tEnable">
+            <template #label>
+              Copilot enhancement
+              <NTooltip trigger="hover" :style="{ maxWidth: '240px' }">
+                <template #trigger>
+                  <NIcon size="14" style="top: 2px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><path d="M256 56C145.72 56 56 145.72 56 256s89.72 200 200 200s200-89.72 200-200S366.28 56 256 56zm0 82a26 26 0 1 1-26 26a26 26 0 0 1 26-26zm64 226H200v-32h44v-88h-32v-32h64v120h44z" fill="currentColor"></path></svg>
+                  </NIcon>
+                </template>
+                Enhance Microsoft Copilot's ability, may cause some problems
+              </NTooltip>
+            </template>
+            <NSwitch v-model:value="gpt4tSetting" />
+          </NFormItem>
+        </NGridItem>
+            <NSwitch v-model:value="gpt4tSetting" />
+          </NFormItem>
+        </NGridItem>
+            <NGridItem>
+              <NFormItem path="sydneyEnable" label="Jailbreak mode">
+                <NSwitch v-model:value="sydneySetting" />
+              </NFormItem>
+            </NGridItem>
+            </NGrid>
+            <NFormItem path="langRegion" label="Language understanding ability">
+              <NSelect v-model:value="langRegionSetting" :options="langRegionOptions" size="large" placeholder="Language understanding ability" />
+            </NFormItem>
+            <NFormItem path="sydneyPrompt" label="Human-machine verification server">
+              <NInput size="large" v-model:value="passServerSetting" type="text" placeholder="Human-machine verification server" />
+            </NFormItem>
+            <NFormItem path="sydneyPrompt" label="Prompt word">
+              <NInput size="large" v-model:value="sydneyPromptSetting" type="text" placeholder="Jailbreak mode prompt word" />
+            </NFormItem>
+            <NFormItem path="themeMode" label="UI version">
+              <NSelect v-model:value="uiVersionSetting" :options="uiVersionOptions" size="large" placeholder="Select UI version" />
+            </NFormItem>
+            <NFormItem path="themeMode" label="Theme mode">
+              <NSelect v-model:value="themeModeSetting" :options="themeModeOptions" size="large" placeholder="Select theme mode" />
+            </NFormItem>
+            <NFormItem v-show="!cookiesEnable" path="customChatNum" label="Chat times">
+              <NInputNumber size="large" v-model:value="customChatNumSetting" min="0" style="width: 100%;"/>
+            </NFormItem>
+            </NForm>
+            <template #action>
+              <NButton size="large" @click="isShowAdvancedSettingModal = false">Cancel</NButton>
+              <NButton ghost size="large" type="info" @click="saveAdvancedSetting">Save</NButton>
+            </template>
+            </NModal>
+            <NModal v-model:show="isShowClearCacheModal" preset="dialog" :show-icon="false">
+              <template #header>
+                <div class="text-xl py-2">Will delete all cache including Cookie?</div>
+              </template>
+              <template #action>
+                <NButton size="large" @click="isShowClearCacheModal = false">Cancel</NButton>
+                <NButton ghost size="large" type="error" @click="resetCache">Confirm</NButton>
+              </template>
+            </NModal>
+            <NModal v-model:show="isShowSetAboutModal" preset="dialog" :show-icon="false">
+              <template #header>
+                <div class="text-3xl py-2">About</div>
+              </template>
+              <NForm ref="formRef" label-placement="left" label-width="82px" size="small" style="margin-top: 16px;">
+                <NFormItem path="version" label="Version number">
+                  <NTag type="info" size="small" round>{{ 'v' + localVersion }}</NTag>
+                </NFormItem>
+                <NFormItem path="latestVersion" label="Latest version" id="latestVersion" ref="latestVersion">
+                  <NTag type="info" size="small" round>{{ lastVersion }}</NTag>
+                </NFormItem>
+              </NForm>
+              <template #action>
+                <NButton ghost size="large" @click="isShowSetAboutModal = false" type="info">Confirm</NButton>
+              </template>
   </NModal>
   <CreateImage v-model:show="isShowCreateImageModal" />
-  </NConfigProvider>
 </template>

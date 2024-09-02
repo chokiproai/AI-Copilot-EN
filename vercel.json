@@ -1,0 +1,65 @@
+{
+  "name": "go-proxy-bingai",
+  "version": 2,
+  "functions": {
+    "api/*.go": {
+      "runtime": "@vercel/go@3.0.5"
+    },
+    "api/v1/*.js": {
+      "memory": 512
+    }
+  },
+  "routes": [
+    {
+      "src": "/sysconf",
+      "dest": "/api/sys-config.go"
+    },
+    {
+      "src": "/api/ms/login",
+      "dest": "/api/login.go"
+    },
+    {
+      "src": "/pass",
+      "dest": "/api/bypass.go"
+    },
+    {
+      "src": "/turing/captcha/challenge",
+      "dest": "/api/challenge.go"
+    },
+    {
+      "src": "/challenge/verify",
+      "dest": "/api/verify.go"
+    },
+    {
+      "src": "/v1/.*",
+      "dest": "/api/v1/vercel.js"
+    },
+    {
+      "src": "/api/v1/.*",
+      "dest": "/api/v1/vercel.js"
+    },
+    {
+      "src": "/designer/.*",
+      "dest": "/api/designer.go"
+    },
+    {
+      "src": "/edgesvc/.*",
+      "dest": "/api/edgesvc.go"
+    },
+    {
+      "src": "/th/.*",
+      "dest": "/api/th.go"
+    },
+    {
+      "src": "/web/.*",
+      "dest": "/api/web.go"
+    },
+    {
+      "src": "/.*",
+      "dest": "/api/index.go"
+    }
+  ],
+  "github": {
+    "silent": true
+  }
+}

@@ -25,7 +25,7 @@ const selectPrompt = (item: IPrompt) => {
 
 <template>
   <NThing
-    class="hover:bg-gray-100 cursor-pointer px-5 h-[130px] flex justify-start items-center"
+    class="hover:bg-gray-400 cursor-pointer px-5 h-[130px] flex justify-start items-center"
     :class="{
       'bg-gray-100': index === selectedPromptIndex,
     }"
