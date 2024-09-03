@@ -31,10 +31,6 @@ jobs:
           npm run build
           cd ..
 
-      - name: Set environment variables
-        env:
-          GO_PROXY_BINGAI_AUTH_KEYS: '12345'
-
       - name: Commit latest webFile
         run: |
           git config --global user.email "dogaopc13@gmail.com"

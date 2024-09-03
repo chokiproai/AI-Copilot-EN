@@ -43,9 +43,13 @@ func CheckAuth(r *http.Request) bool {
 	isAuth := true
 	if len(common.AUTH_KEYS) > 0 {
 		if common.AUTH_KEYS[0] != "" {
-			ckAuthKey, _ := r.Cookie(common.AUTH_KEY_COOKIE_NAME)
-			isAuth = ckAuthKey != nil && len(ckAuthKey.Value) > 0 && common.IsInArray(common.AUTH_KEYS, ckAuthKey.Value)
+			ckAuthKey, err := r.Cookie(common.AUTH_KEY_COOKIE_NAME)
+			if err != nil {
+				return false
+			}
+			isAuth = len(ckAuthKey.Value) > 0 && common.IsInArray(common.AUTH_KEYS, ckAuthKey.Value)
 		}
 	}
 	return isAuth
 }
+
