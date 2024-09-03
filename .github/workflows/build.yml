@@ -17,11 +17,6 @@ jobs:
         with:
           node-version: 18.17.0
 
-      - name: Set environment variables
-        env:
-          GO_PROXY_BINGAI_AUTH_KEYS: ${{ secrets.GO_PROXY_BINGAI_AUTH_KEYS }}
-          AUTH_KEY_COOKIE_NAME: 'BingAI_Auth_Key'
-
       - name: Build Frontend
         run: |
           git checkout web/web.go

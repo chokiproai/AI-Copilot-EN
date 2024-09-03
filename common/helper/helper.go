@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"adams549659584/go-proxy-bingai/common"
 	"encoding/json"
 	"net/http"
 )
@@ -38,18 +37,3 @@ func ErrorResult(w http.ResponseWriter, code int, msg string) error {
 func UnauthorizedResult(w http.ResponseWriter) error {
 	return ErrorResult(w, http.StatusUnauthorized, "unauthorized")
 }
-
-func CheckAuth(r *http.Request) bool {
-	isAuth := true
-	if len(common.AUTH_KEYS) > 0 {
-		if common.AUTH_KEYS[0] != "" {
-			ckAuthKey, err := r.Cookie(common.AUTH_KEY_COOKIE_NAME)
-			if err != nil {
-				return false
-			}
-			isAuth = len(ckAuthKey.Value) > 0 && common.IsInArray(common.AUTH_KEYS, ckAuthKey.Value)
-		}
-	}
-	return isAuth
-}
-
