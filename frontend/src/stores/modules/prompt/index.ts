@@ -51,7 +51,7 @@ export const usePromptStore = defineStore(
     const optPromptConfig = ref<{
       isShow: boolean;
       type?: 'add' | 'edit';
-      title?: 'Add suggestion' | 'Edit suggestion';
+      title?: 'Add prompt' | 'Edit prompt';
       tmpPrompt?: IPrompt;
       newPrompt: IPrompt;
     }>({
